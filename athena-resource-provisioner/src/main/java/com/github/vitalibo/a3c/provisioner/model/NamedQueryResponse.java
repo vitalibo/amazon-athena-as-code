@@ -3,5 +3,5 @@ package com.github.vitalibo.a3c.provisioner.model;
 import lombok.Data;
 
 @Data
-public class CreateNamedQueryRequest {
+public class NamedQueryResponse extends ResponseData {
 }

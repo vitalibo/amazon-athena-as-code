@@ -1,13 +1,13 @@
 package com.github.vitalibo.a3c.provisioner.facade;
 
-import com.github.vitalibo.a3c.provisioner.Facade;
-import com.github.vitalibo.a3c.provisioner.model.DeleteNamedQueryRequest;
-import com.github.vitalibo.a3c.provisioner.model.DeleteNamedQueryResponse;
+import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionerException;
+import com.github.vitalibo.a3c.provisioner.model.NamedQueryRequest;
+import com.github.vitalibo.a3c.provisioner.model.NamedQueryResponse;
 
-public class DeleteNamedQueryFacade implements Facade<DeleteNamedQueryRequest, DeleteNamedQueryResponse> {
+public class DeleteNamedQueryFacade extends DeleteFacade<NamedQueryRequest, NamedQueryResponse> {
 
     @Override
-    public DeleteNamedQueryResponse process(DeleteNamedQueryRequest request) throws Exception {
+    public NamedQueryResponse delete(NamedQueryRequest request) throws AthenaResourceProvisionerException {
         return null;
     }
 

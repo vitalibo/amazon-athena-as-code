@@ -1,7 +1,10 @@
 package com.github.vitalibo.a3c.provisioner;
 
-public interface Facade<Request, Response> {
+import com.github.vitalibo.a3c.provisioner.model.ResourceProviderRequest;
+import com.github.vitalibo.a3c.provisioner.model.ResourceProviderResponse;
 
-    Response process(Request request) throws Exception;
+public interface Facade {
+
+    ResourceProviderResponse process(ResourceProviderRequest request);
 
 }

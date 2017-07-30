@@ -1,13 +1,13 @@
 package com.github.vitalibo.a3c.provisioner.facade;
 
-import com.github.vitalibo.a3c.provisioner.Facade;
-import com.github.vitalibo.a3c.provisioner.model.CreateNamedQueryRequest;
-import com.github.vitalibo.a3c.provisioner.model.CreateNamedQueryResponse;
+import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionerException;
+import com.github.vitalibo.a3c.provisioner.model.NamedQueryRequest;
+import com.github.vitalibo.a3c.provisioner.model.NamedQueryResponse;
 
-public class CreateNamedQueryFacade implements Facade<CreateNamedQueryRequest, CreateNamedQueryResponse> {
+public class CreateNamedQueryFacade extends CreateFacade<NamedQueryRequest, NamedQueryResponse> {
 
     @Override
-    public CreateNamedQueryResponse process(CreateNamedQueryRequest request) throws Exception {
+    public NamedQueryResponse create(NamedQueryRequest request) throws AthenaResourceProvisionerException {
         return null;
     }
 
