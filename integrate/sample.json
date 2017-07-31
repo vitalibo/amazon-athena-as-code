@@ -2,5 +2,19 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "",
   "Resources": {
+    "NamedQuery": {
+      "Type": "Custom::AthenaNamedQuery",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:test-cf2"
+        },
+        "Name": "MyFirstQuery",
+        "Description": "This simple query.",
+        "Database": "mydb",
+        "Query": {
+          "QueryString": "SELECT * FROM test;"
+        }
+      }
+    }
   }
 }

@@ -6,6 +6,9 @@ import lombok.Data;
 @Data
 public class ResourceProviderRequest {
 
+    @JsonProperty(value = "ServiceToken")
+    private String serviceToken;
+
     @JsonProperty(value = "RequestType")
     private RequestType requestType;
 

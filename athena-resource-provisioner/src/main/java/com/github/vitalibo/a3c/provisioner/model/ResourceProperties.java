@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class NamedQueryResponse extends ResponseData {
+public class ResourceProperties {
 
-    @JsonProperty("NamedQueryId")
-    private String id;
+    @JsonProperty("ServiceToken")
+    private String serviceToken;
 
 }
