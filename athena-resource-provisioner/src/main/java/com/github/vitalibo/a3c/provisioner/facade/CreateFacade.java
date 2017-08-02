@@ -12,7 +12,8 @@ public interface CreateFacade<Request, Response extends ResponseData> extends Fa
     @Override
     @SuppressWarnings("unchecked")
     default ResourceProviderResponse process(ResourceProviderRequest request) throws AthenaResourceProvisionException {
-        final Response response = create((Request) request.getResourceProperties());
+        final Response response = create(
+            (Request) request.getResourceProperties());
 
         return ResourceProviderResponse.builder()
             .status(ResponseStatus.SUCCESS)

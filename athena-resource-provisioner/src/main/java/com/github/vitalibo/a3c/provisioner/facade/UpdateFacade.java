@@ -14,8 +14,7 @@ public interface UpdateFacade<Request, Response extends ResponseData> extends Fa
     default ResourceProviderResponse process(ResourceProviderRequest request) throws AthenaResourceProvisionException {
         final Response response = update(
             (Request) request.getResourceProperties(),
-            (Request) request.getOldResourceProperties(),
-            request.getPhysicalResourceId());
+            (Request) request.getOldResourceProperties());
 
         return ResourceProviderResponse.builder()
             .status(ResponseStatus.SUCCESS)
@@ -27,6 +26,6 @@ public interface UpdateFacade<Request, Response extends ResponseData> extends Fa
             .build();
     }
 
-    Response update(Request request, Request oldResourceRequest, String physicalResourceId) throws AthenaResourceProvisionException;
+    Response update(Request request, Request oldResourceRequest) throws AthenaResourceProvisionException;
 
 }

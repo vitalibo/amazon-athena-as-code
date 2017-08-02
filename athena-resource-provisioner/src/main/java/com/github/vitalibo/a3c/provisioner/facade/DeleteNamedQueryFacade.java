@@ -13,13 +13,13 @@ public class DeleteNamedQueryFacade implements DeleteFacade<NamedQueryRequest, N
     private final AmazonAthena amazonAthena;
 
     @Override
-    public NamedQueryResponse delete(NamedQueryRequest request, String physicalResourceId) throws AthenaResourceProvisionException {
+    public NamedQueryResponse delete(NamedQueryRequest request) throws AthenaResourceProvisionException {
         amazonAthena.deleteNamedQuery(
             new DeleteNamedQueryRequest()
-                .withNamedQueryId(physicalResourceId));
+                .withNamedQueryId(request.getPhysicalResourceId()));
 
         NamedQueryResponse response = new NamedQueryResponse();
-        response.setPhysicalResourceId(physicalResourceId);
+        response.setPhysicalResourceId(request.getPhysicalResourceId());
         return response;
     }
 

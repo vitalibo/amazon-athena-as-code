@@ -2,19 +2,15 @@ package com.github.vitalibo.a3c.provisioner.facade;
 
 import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
 import com.github.vitalibo.a3c.provisioner.Facade;
-import com.github.vitalibo.a3c.provisioner.model.ResourceProviderRequest;
-import com.github.vitalibo.a3c.provisioner.model.ResourceProviderResponse;
-import com.github.vitalibo.a3c.provisioner.model.ResponseData;
-import com.github.vitalibo.a3c.provisioner.model.ResponseStatus;
+import com.github.vitalibo.a3c.provisioner.model.*;
 
-public interface DeleteFacade<Request, Response extends ResponseData> extends Facade {
+public interface DeleteFacade<Request extends RequestProperties, Response extends ResponseData> extends Facade {
 
     @Override
     @SuppressWarnings("unchecked")
     default ResourceProviderResponse process(ResourceProviderRequest request) throws AthenaResourceProvisionException {
         final Response response = delete(
-            (Request) request.getResourceProperties(),
-            request.getPhysicalResourceId());
+            (Request) request.getResourceProperties());
 
         return ResourceProviderResponse.builder()
             .status(ResponseStatus.SUCCESS)
@@ -26,6 +22,6 @@ public interface DeleteFacade<Request, Response extends ResponseData> extends Fa
             .build();
     }
 
-    Response delete(Request request, String physicalResourceId) throws AthenaResourceProvisionException;
+    Response delete(Request request) throws AthenaResourceProvisionException;
 
 }
