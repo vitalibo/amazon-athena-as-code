@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class NamedQueryRequest extends RequestProperties {
+public class NamedQueryRequest extends ResourceProperties {
 
     @JsonProperty("Name")
     private String name;

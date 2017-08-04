@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class RequestProperties {
-
-    @JsonProperty(value = "ServiceToken")
-    private String serviceToken;
+public class ResourceData {
 
     @JsonProperty(value = "PhysicalResourceId")
     private String physicalResourceId;

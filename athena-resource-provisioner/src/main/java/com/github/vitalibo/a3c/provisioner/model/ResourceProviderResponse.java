@@ -11,7 +11,7 @@ import lombok.Data;
 public class ResourceProviderResponse {
 
     @JsonProperty(value = "Status")
-    private ResponseStatus status;
+    private Status status;
 
     @JsonProperty(value = "Reason")
     private String reason;
@@ -29,6 +29,6 @@ public class ResourceProviderResponse {
     private String logicalResourceId;
 
     @JsonProperty(value = "Data")
-    private ResponseData data;
+    private ResourceData data;
 
 }

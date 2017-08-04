@@ -27,8 +27,8 @@ public class UpdateNamedQueryFacade implements UpdateFacade<NamedQueryRequest, N
     private final AmazonS3 amazonS3;
 
     @Override
-    public NamedQueryResponse update(NamedQueryRequest request,
-                                     NamedQueryRequest oldRequest) throws AthenaResourceProvisionException {
+    public NamedQueryResponse update(NamedQueryRequest request, NamedQueryRequest oldRequest,
+                                     String physicalResourceId) throws AthenaResourceProvisionException {
         rules.forEach(rule -> rule.accept(request));
 
         CreateNamedQueryResult result = amazonAthena.createNamedQuery(new CreateNamedQueryRequest()
@@ -38,7 +38,7 @@ public class UpdateNamedQueryFacade implements UpdateFacade<NamedQueryRequest, N
             .withName(request.getName()));
 
         NamedQueryResponse response = new NamedQueryResponse();
-        response.setId(result.getNamedQueryId());
+        response.setQueryId(result.getNamedQueryId());
         response.setPhysicalResourceId(result.getNamedQueryId());
         return response;
     }

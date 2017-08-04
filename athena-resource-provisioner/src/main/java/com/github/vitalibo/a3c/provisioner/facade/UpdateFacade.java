@@ -2,22 +2,40 @@ package com.github.vitalibo.a3c.provisioner.facade;
 
 import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
 import com.github.vitalibo.a3c.provisioner.Facade;
-import com.github.vitalibo.a3c.provisioner.model.ResourceProviderRequest;
-import com.github.vitalibo.a3c.provisioner.model.ResourceProviderResponse;
-import com.github.vitalibo.a3c.provisioner.model.ResponseData;
-import com.github.vitalibo.a3c.provisioner.model.ResponseStatus;
+import com.github.vitalibo.a3c.provisioner.model.*;
+import com.github.vitalibo.a3c.provisioner.model.transform.ResourcePropertiesTranslator;
 
-public interface UpdateFacade<Request, Response extends ResponseData> extends Facade {
+public interface UpdateFacade<Request extends ResourceProperties, Response extends ResourceData> extends Facade {
 
     @Override
     @SuppressWarnings("unchecked")
     default ResourceProviderResponse process(ResourceProviderRequest request) throws AthenaResourceProvisionException {
+        final Request resourceProperties =
+            ResourcePropertiesTranslator.of(request.getResourceType())
+                .from(request.getResourceProperties());
+
+        final Request oldResourceProperties;
+        try {
+            oldResourceProperties =
+                ResourcePropertiesTranslator.of(request.getResourceType())
+                    .from(request.getOldResourceProperties());
+
+        } catch (AthenaResourceProvisionException ignored) {
+            // When status UPDATE_ROLLBACK_IN_PROGRESS
+            return ResourceProviderResponse.builder()
+                .status(Status.SUCCESS)
+                .logicalResourceId(request.getLogicalResourceId())
+                .requestId(request.getRequestId())
+                .stackId(request.getStackId())
+                .physicalResourceId(request.getPhysicalResourceId())
+                .build();
+        }
+
         final Response response = update(
-            (Request) request.getResourceProperties(),
-            (Request) request.getOldResourceProperties());
+            resourceProperties, oldResourceProperties, request.getPhysicalResourceId());
 
         return ResourceProviderResponse.builder()
-            .status(ResponseStatus.SUCCESS)
+            .status(Status.SUCCESS)
             .logicalResourceId(request.getLogicalResourceId())
             .requestId(request.getRequestId())
             .stackId(request.getStackId())
@@ -26,6 +44,6 @@ public interface UpdateFacade<Request, Response extends ResponseData> extends Fa
             .build();
     }
 
-    Response update(Request request, Request oldResourceRequest) throws AthenaResourceProvisionException;
+    Response update(Request request, Request oldResourceRequest, String physicalResourceId) throws AthenaResourceProvisionException;
 
 }

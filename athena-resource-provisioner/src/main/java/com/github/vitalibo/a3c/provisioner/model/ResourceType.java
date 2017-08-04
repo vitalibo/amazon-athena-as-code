@@ -16,7 +16,7 @@ public enum ResourceType {
     @Getter
     private final String name;
     @Getter
-    private final Class<? extends RequestProperties> typeClass;
+    private final Class<? extends ResourceProperties> typeClass;
 
     public static ResourceType of(String name) {
         return Stream.of(values())

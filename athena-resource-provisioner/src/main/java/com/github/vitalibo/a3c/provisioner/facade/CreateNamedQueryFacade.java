@@ -8,9 +8,9 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.util.StringUtils;
 import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
-import com.github.vitalibo.a3c.provisioner.util.Rule;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryRequest;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryResponse;
+import com.github.vitalibo.a3c.provisioner.util.Rule;
 import lombok.RequiredArgsConstructor;
 
 import java.io.BufferedReader;
@@ -37,7 +37,7 @@ public class CreateNamedQueryFacade implements CreateFacade<NamedQueryRequest, N
             .withName(request.getName()));
 
         NamedQueryResponse response = new NamedQueryResponse();
-        response.setId(result.getNamedQueryId());
+        response.setQueryId(result.getNamedQueryId());
         response.setPhysicalResourceId(result.getNamedQueryId());
         return response;
     }
