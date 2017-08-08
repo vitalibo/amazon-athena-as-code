@@ -1,0 +1,27 @@
+{
+  "RequestType": "Update",
+  "RequestId": "unique id for this update request",
+  "ResponseURL": "pre-signed-url-for-update-response",
+  "StackId": "arn:aws:cloudformation:us-east-2:namespace:stack/stack-name/guid",
+  "ResourceType": "Custom::MyCustomResourceType",
+  "LogicalResourceId": "name of resource in template",
+  "PhysicalResourceId": "custom resource provider-defined physical id",
+  "ResourceProperties": {
+    "key1": "new-string",
+    "key2": [
+      "new-list"
+    ],
+    "key3": {
+      "key4": "new-map"
+    }
+  },
+  "OldResourceProperties": {
+    "key1": "string",
+    "key2": [
+      "list"
+    ],
+    "key3": {
+      "key4": "map"
+    }
+  }
+}

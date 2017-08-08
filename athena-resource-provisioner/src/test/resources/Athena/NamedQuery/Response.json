@@ -1,0 +1,4 @@
+{
+  "PhysicalResourceId": "required vendor-defined physical id that is unique for that vendor",
+  "NamedQueryId": "the unique identifier of the query"
+}

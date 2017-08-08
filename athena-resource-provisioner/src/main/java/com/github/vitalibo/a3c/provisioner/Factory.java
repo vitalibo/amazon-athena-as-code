@@ -9,8 +9,11 @@ import com.github.vitalibo.a3c.provisioner.facade.CreateNamedQueryFacade;
 import com.github.vitalibo.a3c.provisioner.facade.DeleteNamedQueryFacade;
 import com.github.vitalibo.a3c.provisioner.facade.UpdateNamedQueryFacade;
 import com.github.vitalibo.a3c.provisioner.model.ResourceProviderRequest;
+import com.github.vitalibo.a3c.provisioner.util.S3PreSignedURL;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
+import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 
@@ -61,6 +64,11 @@ public class Factory {
             default:
                 throw new IllegalStateException();
         }
+    }
+
+    @SneakyThrows
+    public S3PreSignedURL createS3PreSignedUrl(String responseUrl) {
+        return new S3PreSignedURL(new URL(responseUrl));
     }
 
     private static AmazonS3 createAmazonS3(Regions region) {

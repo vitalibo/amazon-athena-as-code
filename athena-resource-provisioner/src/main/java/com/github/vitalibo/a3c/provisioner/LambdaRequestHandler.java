@@ -62,7 +62,7 @@ public class LambdaRequestHandler implements RequestStreamHandler {
         }
 
         String responseJson = Jackson.toJsonString(response);
-        S3PreSignedURL preSignedUrl = new S3PreSignedURL(request.getResponseUrl());
+        S3PreSignedURL preSignedUrl = factory.createS3PreSignedUrl(request.getResponseUrl());
         preSignedUrl.upload(responseJson);
 
         try (OutputStreamWriter writer = new OutputStreamWriter(output)) {

@@ -7,6 +7,8 @@ import com.github.vitalibo.a3c.provisioner.model.ResourceType;
 import com.github.vitalibo.a3c.provisioner.util.Jackson;
 import lombok.RequiredArgsConstructor;
 
+import static com.github.vitalibo.a3c.provisioner.model.ResourceType.Unknown;
+
 @RequiredArgsConstructor(staticName = "of")
 public class ResourcePropertiesTranslator {
 
@@ -14,6 +16,10 @@ public class ResourcePropertiesTranslator {
 
     @SuppressWarnings("unchecked")
     public <T extends ResourceProperties> T from(Object resourceProperties) throws AthenaResourceProvisionException {
+        if (Unknown.equals(resourceType)) {
+            throw new AthenaResourceProvisionException("Unknown resource type.");
+        }
+
         try {
             return (T) Jackson.convertValue(resourceProperties, resourceType.getTypeClass());
         } catch (IllegalArgumentException e) {

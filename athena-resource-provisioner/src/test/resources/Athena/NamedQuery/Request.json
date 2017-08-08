@@ -1,0 +1,11 @@
+{
+  "ServiceToken": "arn:aws:lambda:eu-west-1:0123456789:function:athena-resource-provisioner",
+  "Name": "the plain-language name of the query",
+  "Description": "a brief description of the query",
+  "Database": "the database to which the query belongs",
+  "Query": {
+    "S3Bucket": "the name of the S3 bucket",
+    "S3Key": "the location and name",
+    "QueryString": "the SQL query statements that comprise the query"
+  }
+}

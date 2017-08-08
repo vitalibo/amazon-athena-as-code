@@ -1,0 +1,12 @@
+{
+  "Status": "SUCCESS",
+  "Reason": "sample of reason string",
+  "PhysicalResourceId": "required vendor-defined physical id that is unique for that vendor",
+  "StackId": "arn:aws:cloudformation:us-east-2:namespace:stack/stack-name/guid (copied from request)",
+  "RequestId": "unique id for this create request (copied from request)",
+  "LogicalResourceId": "name of resource in template (copied from request)",
+  "Data": {
+    "keyThatCanBeUsedInGetAtt1": "data for key 1",
+    "keyThatCanBeUsedInGetAtt2": "data for key 2"
+  }
+}

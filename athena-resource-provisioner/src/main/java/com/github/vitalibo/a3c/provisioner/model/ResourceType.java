@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 @JsonDeserialize(using = ResourceTypeDeserializer.class)
 public enum ResourceType {
 
+    Unknown(null, ResourceProperties.class),
     NamedQuery("Custom::AthenaNamedQuery", NamedQueryRequest.class);
 
     @Getter
@@ -21,7 +22,7 @@ public enum ResourceType {
     public static ResourceType of(String name) {
         return Stream.of(values())
             .filter(o -> name.equals(o.name))
-            .findFirst().orElseThrow(IllegalArgumentException::new);
+            .findFirst().orElse(Unknown);
     }
 
 }

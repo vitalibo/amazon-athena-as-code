@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 @RequiredArgsConstructor
@@ -13,12 +12,11 @@ public class S3PreSignedURL {
 
     private final URL responseUrl;
 
-    public S3PreSignedURL(String responseUrl) throws MalformedURLException {
-        this(new URL(responseUrl));
+    public void upload(String response) throws IOException {
+        upload((HttpURLConnection) responseUrl.openConnection(), response);
     }
 
-    public void upload(String response) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) responseUrl.openConnection();
+    void upload(HttpURLConnection connection, String response) throws IOException {
         connection.setDoOutput(true);
         connection.setRequestMethod("PUT");
         OutputStreamWriter out = new OutputStreamWriter(
