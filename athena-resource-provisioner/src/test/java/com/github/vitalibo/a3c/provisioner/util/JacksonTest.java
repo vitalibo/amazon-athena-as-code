@@ -2,13 +2,13 @@ package com.github.vitalibo.a3c.provisioner.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import java.util.Map;
 
@@ -39,8 +39,7 @@ public class JacksonTest {
 
     @Test
     public void testFromJsonInputStream() {
-        byte[] jsonAsBytes = "{\"foo\":\"bar\"}".getBytes();
-        Map actual = Jackson.fromJsonString(new ByteInputStream(jsonAsBytes, jsonAsBytes.length), Map.class);
+        Map actual = Jackson.fromJsonString(new ByteArrayInputStream("{\"foo\":\"bar\"}".getBytes()), Map.class);
 
         Assert.assertNotNull(actual);
         Assert.assertEquals(actual.get("foo"), "bar");
@@ -59,9 +58,8 @@ public class JacksonTest {
 
     @Test
     public void testFromJsonInputStreamTypeReference() {
-        byte[] jsonAsBytes = "{\"foo\":\"bar\"}".getBytes();
         Map<String, String> actual = Jackson.fromJsonString(
-            new ByteInputStream(jsonAsBytes, jsonAsBytes.length),
+            new ByteArrayInputStream("{\"foo\":\"bar\"}".getBytes()),
             new TypeReference<Map<String, String>>() {
             });
 

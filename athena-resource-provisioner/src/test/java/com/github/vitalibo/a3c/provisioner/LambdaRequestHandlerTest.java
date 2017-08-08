@@ -10,8 +10,6 @@ import com.github.vitalibo.a3c.provisioner.model.ResourceProviderResponse;
 import com.github.vitalibo.a3c.provisioner.model.Status;
 import com.github.vitalibo.a3c.provisioner.util.Jackson;
 import com.github.vitalibo.a3c.provisioner.util.S3PreSignedURL;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -19,6 +17,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Map;
 
 public class LambdaRequestHandlerTest {
@@ -50,7 +50,7 @@ public class LambdaRequestHandlerTest {
 
     @Test
     public void testHandleRequest() throws Exception {
-        ByteOutputStream outputStream = new ByteOutputStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] resourceProviderRequest = makeResourceProviderRequestJson();
         Mockito.when(mockCreateFacade.process(Mockito.any()))
             .thenReturn(ResourceProviderResponse.builder()
@@ -62,9 +62,9 @@ public class LambdaRequestHandlerTest {
             .thenReturn(ResourceProviderResponse.builder()
                 .status(Status.SUCCESS).build());
 
-        lambda.handleRequest(new ByteInputStream(resourceProviderRequest, resourceProviderRequest.length), outputStream, mockContext);
+        lambda.handleRequest(new ByteArrayInputStream(resourceProviderRequest), outputStream, mockContext);
 
-        String actual = new String(outputStream.getBytes());
+        String actual = new String(outputStream.toByteArray());
         Assert.assertNotNull(actual);
         Assert.assertEquals(actual.trim(), "{\"Status\":\"SUCCESS\"}");
         Mockito.verify(mockCreateFacade, Mockito.never()).process(Mockito.any());
@@ -75,7 +75,7 @@ public class LambdaRequestHandlerTest {
 
     @Test
     public void testFailHandleRequest() throws Exception {
-        ByteOutputStream outputStream = new ByteOutputStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] resourceProviderRequest = makeResourceProviderRequestJson();
         Mockito.when(mockCreateFacade.process(Mockito.any()))
             .thenReturn(ResourceProviderResponse.builder()
@@ -86,9 +86,9 @@ public class LambdaRequestHandlerTest {
         Mockito.when(mockUpdateFacade.process(Mockito.any()))
             .thenThrow(new AthenaResourceProvisionException());
 
-        lambda.handleRequest(new ByteInputStream(resourceProviderRequest, resourceProviderRequest.length), outputStream, mockContext);
+        lambda.handleRequest(new ByteArrayInputStream(resourceProviderRequest), outputStream, mockContext);
 
-        String actual = new String(outputStream.getBytes());
+        String actual = new String(outputStream.toByteArray());
         Assert.assertNotNull(actual);
         Assert.assertTrue(actual.trim().contains("\"Status\":\"FAILED\""));
         Mockito.verify(mockCreateFacade, Mockito.never()).process(Mockito.any());
