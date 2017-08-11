@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "This CloudFormation format show sample usage of Amazon Athena as Code",
+  "Description": "This AWS CloudFormation template Create/Update sample usage of Amazon Athena as Code service",
   "Parameters": {
     "Bucket": {
       "Type": "String"
