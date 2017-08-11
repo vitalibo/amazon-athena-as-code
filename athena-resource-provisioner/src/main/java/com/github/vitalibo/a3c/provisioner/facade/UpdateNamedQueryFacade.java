@@ -10,18 +10,18 @@ import com.amazonaws.util.StringUtils;
 import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryRequest;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryResponse;
-import com.github.vitalibo.a3c.provisioner.util.Rule;
 import lombok.AllArgsConstructor;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Collection;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class UpdateNamedQueryFacade implements UpdateFacade<NamedQueryRequest, NamedQueryResponse> {
 
-    private final Collection<Rule<NamedQueryRequest>> rules;
+    private final Collection<BiConsumer<NamedQueryRequest, NamedQueryRequest>> rules;
 
     private final AmazonAthena amazonAthena;
     private final AmazonS3 amazonS3;
@@ -29,7 +29,7 @@ public class UpdateNamedQueryFacade implements UpdateFacade<NamedQueryRequest, N
     @Override
     public NamedQueryResponse update(NamedQueryRequest request, NamedQueryRequest oldRequest,
                                      String physicalResourceId) throws AthenaResourceProvisionException {
-        rules.forEach(rule -> rule.accept(request));
+        rules.forEach(rule -> rule.accept(request, oldRequest));
 
         CreateNamedQueryResult result = amazonAthena.createNamedQuery(new CreateNamedQueryRequest()
             .withDatabase(request.getDatabase())

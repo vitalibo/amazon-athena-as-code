@@ -1,6 +1,11 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "",
+  "Parameters": {
+    "Bucket": {
+      "Type": "String"
+    }
+  },
   "Resources": {
     "NamedQuery": {
       "Type": "Custom::AthenaNamedQuery",
@@ -10,10 +15,34 @@
         },
         "Name": "MyFirstQuery",
         "Description": "This simple query.",
-        "Database": "mydb",
+        "Database": {
+          "Ref": "Database"
+        },
         "Query": {
           "QueryString": "SELECT * FROM test;"
         }
+      }
+    },
+    "Database": {
+      "Type": "Custom::AthenaDatabase",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:test-cf2"
+        },
+        "Name": "My_DataBase_Name",
+        "Location": {
+          "Ref": "Bucket"
+        },
+        "Properties": [
+          {
+            "Name": "Key1",
+            "Value": "Value2"
+          },
+          {
+            "Name": "Key2",
+            "Value": "Value1"
+          }
+        ]
       }
     }
   }

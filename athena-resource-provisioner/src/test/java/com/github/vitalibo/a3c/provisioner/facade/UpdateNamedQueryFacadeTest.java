@@ -44,7 +44,7 @@ public class UpdateNamedQueryFacadeTest {
 
     @Test(expectedExceptions = RuntimeException.class)
     public void testFailValidation() throws AthenaResourceProvisionException {
-        facade = new UpdateNamedQueryFacade(Collections.singletonList(o -> {
+        facade = new UpdateNamedQueryFacade(Collections.singletonList((o, a) -> {
             throw new RuntimeException();
         }), mockAmazonAthena, mockAmazonS3);
 

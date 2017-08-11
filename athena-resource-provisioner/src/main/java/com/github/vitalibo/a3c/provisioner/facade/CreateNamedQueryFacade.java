@@ -10,18 +10,18 @@ import com.amazonaws.util.StringUtils;
 import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryRequest;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryResponse;
-import com.github.vitalibo.a3c.provisioner.util.Rule;
 import lombok.RequiredArgsConstructor;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Collection;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class CreateNamedQueryFacade implements CreateFacade<NamedQueryRequest, NamedQueryResponse> {
 
-    private final Collection<Rule<NamedQueryRequest>> rules;
+    private final Collection<Consumer<NamedQueryRequest>> rules;
 
     private final AmazonAthena amazonAthena;
     private final AmazonS3 amazonS3;
