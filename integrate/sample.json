@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "",
+  "Description": "This CloudFormation format show sample usage of Amazon Athena as Code",
   "Parameters": {
     "Bucket": {
       "Type": "String"
@@ -19,7 +19,17 @@
           "Ref": "Database"
         },
         "Query": {
-          "QueryString": "SELECT * FROM test;"
+          "QueryString": {
+            "Fn::Join": [
+              " ",
+              [
+                "SELECT * FROM",
+                {
+                  "Ref": "Table"
+                }
+              ]
+            ]
+          }
         }
       }
     },
@@ -41,6 +51,70 @@
           {
             "Name": "Key2",
             "Value": "Value1"
+          }
+        ]
+      }
+    },
+    "Table": {
+      "DependsOn": "Database",
+      "Type": "Custom::AthenaExternalTable",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:test-cf2"
+        },
+        "Name": "MyTableName",
+        "Database": {
+          "Ref": "Database"
+        },
+        "Schema": [
+          {
+            "Name": "Column1",
+            "DataType": "STRING",
+            "Comment": "Comment #1"
+          },
+          {
+            "Name": "Column2",
+            "DataType": "ARRAY<STRING>"
+          },
+          {
+            "Name": "Column3",
+            "DataType": "TIMESTAMP",
+            "Comment": "Comment #2"
+          }
+        ],
+        "Comment": "This is the Table Comment.",
+        "Partition": [
+          {
+            "Name": "Partition1",
+            "DataType": "TIMESTAMP"
+          },
+          {
+            "Name": "Partition2",
+            "DataType": "STRING",
+            "Comment": "Comment #3"
+          }
+        ],
+        "SerDe": {
+          "RowFormat": "org.openx.data.jsonserde.JsonSerDe",
+          "StoredAs": "TEXTFILE",
+          "Properties": [
+            {
+              "Name": "serialization.format",
+              "Value": "1"
+            }
+          ]
+        },
+        "Location": {
+          "Ref": "Bucket"
+        },
+        "Properties": [
+          {
+            "Name": "has_encrypted_data",
+            "Value": "false"
+          },
+          {
+            "Name": "Key1",
+            "Value": "Value2"
           }
         ]
       }

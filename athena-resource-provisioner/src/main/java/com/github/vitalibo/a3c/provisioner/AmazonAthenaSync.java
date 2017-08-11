@@ -32,8 +32,7 @@ public class AmazonAthenaSync implements AmazonAthena {
                 break;
             case "FAILED":
             case "CANCELLED":
-                throw new AthenaResourceProvisionException(
-                    String.format("Query execution: %s. %s", status.getState(), status.getStateChangeReason()));
+                throw new AthenaResourceProvisionException(status.getStateChangeReason());
             default:
                 throw new IllegalStateException();
         }

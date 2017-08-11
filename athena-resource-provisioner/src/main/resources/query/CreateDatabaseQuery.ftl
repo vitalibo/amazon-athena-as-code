@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS ${Name}
+CREATE DATABASE ${Name}
 LOCATION 's3://${Location}/'
 <#if Properties??>
 WITH DBPROPERTIES (

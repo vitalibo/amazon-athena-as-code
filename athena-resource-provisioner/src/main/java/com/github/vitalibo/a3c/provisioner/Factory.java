@@ -43,14 +43,7 @@ public class Factory {
         amazonS3 = createAmazonS3(region);
         amazonAthena = createAmazonAthena(region);
         freemarkerConfiguration = createConfiguration();
-        athenaResultConfiguration = new ResultConfiguration()
-            .withOutputLocation(env.get(ATHENA_RESULT_OUTPUT_LOCATION))
-            .withEncryptionConfiguration(Optional.ofNullable(
-                new EncryptionConfiguration()
-                    .withEncryptionOption(env.get(ATHENA_RESULT_ENCRYPTION_OPTION))
-                    .withKmsKey(env.get(ATHENA_RESULT_KMS_KEY)))
-                .filter(o -> !StringUtils.isNullOrEmpty(o.getEncryptionOption()) && !StringUtils.isNullOrEmpty(o.getKmsKey()))
-                .orElse(null));
+        athenaResultConfiguration = createResultConfiguration(env);
     }
 
     public Facade createCreateFacade(ResourceProviderRequest request) {
@@ -67,7 +60,11 @@ public class Factory {
                     athenaResultConfiguration,
                     makeQueryStringTranslator("CreateDatabaseQuery"));
             case ExternalTable:
-                return new CreateExternalTableFacade();
+                return new CreateExternalTableFacade(
+                    Collections.emptyList(),
+                    new AmazonAthenaSync(amazonAthena),
+                    athenaResultConfiguration,
+                    makeQueryStringTranslator("CreateTableQuery"));
             default:
                 throw new IllegalStateException();
         }
@@ -83,7 +80,10 @@ public class Factory {
                     athenaResultConfiguration,
                     makeQueryStringTranslator("DropDatabaseQuery"));
             case ExternalTable:
-                return new DeleteExternalTableFacade();
+                return new DeleteExternalTableFacade(
+                    new AmazonAthenaSync(amazonAthena),
+                    athenaResultConfiguration,
+                    makeQueryStringTranslator("DropTableQuery"));
             default:
                 throw new IllegalStateException();
         }
@@ -104,7 +104,12 @@ public class Factory {
                     makeQueryStringTranslator("CreateDatabaseQuery"),
                     makeQueryStringTranslator("UpdateDatabasePropertiesQuery"));
             case ExternalTable:
-                return new UpdateExternalTableFacade();
+                return new UpdateExternalTableFacade(
+                    Collections.emptyList(),
+                    new AmazonAthenaSync(amazonAthena),
+                    athenaResultConfiguration,
+                    makeQueryStringTranslator("CreateTableQuery"),
+                    makeQueryStringTranslator("DropTableQuery"));
             default:
                 throw new IllegalStateException();
         }
@@ -132,6 +137,17 @@ public class Factory {
         return AmazonAthenaClient.builder()
             .withRegion(region)
             .build();
+    }
+
+    private static ResultConfiguration createResultConfiguration(Map<String, String> env) {
+        return new ResultConfiguration()
+            .withOutputLocation(env.get(ATHENA_RESULT_OUTPUT_LOCATION))
+            .withEncryptionConfiguration(Optional.ofNullable(
+                new EncryptionConfiguration()
+                    .withEncryptionOption(env.get(ATHENA_RESULT_ENCRYPTION_OPTION))
+                    .withKmsKey(env.get(ATHENA_RESULT_KMS_KEY)))
+                .filter(o -> !StringUtils.isNullOrEmpty(o.getEncryptionOption()) && !StringUtils.isNullOrEmpty(o.getKmsKey()))
+                .orElse(null));
     }
 
     private static Configuration createConfiguration() {
