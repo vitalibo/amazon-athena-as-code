@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
+set -e
 
 if [ $# -ne 1 ]; then
-  echo "Usage: $0 [source-bucket]"
+  echo "Usage: $0 [user] [bucket]"
   echo ''
   echo 'Options:'
-  echo '  source-bucket        S3 bucket name where data will be stored'
+  echo '  user       User name'
+  echo '  bucket     S3 bucket name where data will be stored'
   exit 1
 fi
 
-S3_BUCKET=$1
+USER=$1
+S3_BUCKET=$2
 
-aws cloudformation deploy --template-file 'sample.json' --stack-name "amazon-athena-as-code-sample" \
+aws cloudformation deploy --template-file 'sample.json' --stack-name "${USER}-sample" \
   --parameter-overrides Bucket=${S3_BUCKET}
