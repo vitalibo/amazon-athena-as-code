@@ -5,8 +5,8 @@ import com.amazonaws.services.athena.model.ResultConfiguration;
 import com.amazonaws.services.athena.model.StartQueryExecutionRequest;
 import com.github.vitalibo.a3c.provisioner.AmazonAthenaSync;
 import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
-import com.github.vitalibo.a3c.provisioner.model.ExternalTableRequest;
-import com.github.vitalibo.a3c.provisioner.model.ExternalTableResponse;
+import com.github.vitalibo.a3c.provisioner.model.TableData;
+import com.github.vitalibo.a3c.provisioner.model.TableProperties;
 import com.github.vitalibo.a3c.provisioner.model.transform.EncryptionConfigurationTranslator;
 import com.github.vitalibo.a3c.provisioner.model.transform.QueryStringTranslator;
 import lombok.RequiredArgsConstructor;
@@ -15,34 +15,34 @@ import java.util.Collection;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
-public class CreateExternalTableFacade implements CreateFacade<ExternalTableRequest, ExternalTableResponse> {
+public class CreateTableFacade implements CreateFacade<TableProperties, TableData> {
 
-    private final Collection<Consumer<ExternalTableRequest>> rules;
+    private final Collection<Consumer<TableProperties>> rules;
 
     private final AmazonAthenaSync amazonAthena;
     private final String outputLocation;
-    private final QueryStringTranslator<ExternalTableRequest> createTableQueryTranslator;
+    private final QueryStringTranslator<TableProperties> createTableQueryTranslator;
 
     @Override
-    public ExternalTableResponse create(ExternalTableRequest request) throws AthenaResourceProvisionException {
-        rules.forEach(rule -> rule.accept(request));
+    public TableData create(TableProperties properties) throws AthenaResourceProvisionException {
+        rules.forEach(rule -> rule.accept(properties));
 
         String queryExecutionId = amazonAthena.startQueryExecution(
             new StartQueryExecutionRequest()
-                .withQueryString(createTableQueryTranslator.from(request))
+                .withQueryString(createTableQueryTranslator.from(properties))
                 .withQueryExecutionContext(new QueryExecutionContext()
-                    .withDatabase(request.getDatabaseName()))
+                    .withDatabase(properties.getDatabaseName()))
                 .withResultConfiguration(new ResultConfiguration()
                     .withOutputLocation(outputLocation)
                     .withEncryptionConfiguration(
-                        EncryptionConfigurationTranslator.from(request))))
+                        EncryptionConfigurationTranslator.from(properties))))
             .getQueryExecutionId();
 
         amazonAthena.waitQueryExecution(queryExecutionId);
 
-        ExternalTableResponse response = new ExternalTableResponse();
-        response.setPhysicalResourceId(request.getName());
-        return response;
+        TableData data = new TableData();
+        data.setPhysicalResourceId(properties.getName());
+        return data;
     }
 
 }

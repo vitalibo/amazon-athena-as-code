@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class DatabaseRequest extends ResourceProperties {
+public class DatabaseProperties extends ResourceProperties {
 
     @JsonProperty(value = "Name")
     private String name;

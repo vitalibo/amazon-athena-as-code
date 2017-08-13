@@ -8,8 +8,8 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.util.StringUtils;
 import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
-import com.github.vitalibo.a3c.provisioner.model.NamedQueryRequest;
-import com.github.vitalibo.a3c.provisioner.model.NamedQueryResponse;
+import com.github.vitalibo.a3c.provisioner.model.NamedQueryData;
+import com.github.vitalibo.a3c.provisioner.model.NamedQueryProperties;
 import lombok.RequiredArgsConstructor;
 
 import java.io.BufferedReader;
@@ -19,30 +19,30 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class CreateNamedQueryFacade implements CreateFacade<NamedQueryRequest, NamedQueryResponse> {
+public class CreateNamedQueryFacade implements CreateFacade<NamedQueryProperties, NamedQueryData> {
 
-    private final Collection<Consumer<NamedQueryRequest>> rules;
+    private final Collection<Consumer<NamedQueryProperties>> rules;
 
     private final AmazonAthena amazonAthena;
     private final AmazonS3 amazonS3;
 
     @Override
-    public NamedQueryResponse create(NamedQueryRequest request) throws AthenaResourceProvisionException {
-        rules.forEach(rule -> rule.accept(request));
+    public NamedQueryData create(NamedQueryProperties properties) throws AthenaResourceProvisionException {
+        rules.forEach(rule -> rule.accept(properties));
 
         CreateNamedQueryResult result = amazonAthena.createNamedQuery(new CreateNamedQueryRequest()
-            .withDatabase(request.getDatabase())
-            .withQueryString(asQueryString(request.getQuery()))
-            .withDescription(request.getDescription())
-            .withName(request.getName()));
+            .withDatabase(properties.getDatabase())
+            .withQueryString(asQueryString(properties.getQuery()))
+            .withDescription(properties.getDescription())
+            .withName(properties.getName()));
 
-        NamedQueryResponse response = new NamedQueryResponse();
-        response.setQueryId(result.getNamedQueryId());
-        response.setPhysicalResourceId(result.getNamedQueryId());
-        return response;
+        NamedQueryData data = new NamedQueryData();
+        data.setQueryId(result.getNamedQueryId());
+        data.setPhysicalResourceId(result.getNamedQueryId());
+        return data;
     }
 
-    private String asQueryString(NamedQueryRequest.Query query) {
+    private String asQueryString(NamedQueryProperties.Query query) {
         String queryString = query.getQueryString();
         if (!StringUtils.isNullOrEmpty(queryString)) {
             return queryString;

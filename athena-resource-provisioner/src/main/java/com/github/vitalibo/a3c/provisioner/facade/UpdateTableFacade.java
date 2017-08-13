@@ -5,8 +5,8 @@ import com.amazonaws.services.athena.model.ResultConfiguration;
 import com.amazonaws.services.athena.model.StartQueryExecutionRequest;
 import com.github.vitalibo.a3c.provisioner.AmazonAthenaSync;
 import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
-import com.github.vitalibo.a3c.provisioner.model.ExternalTableRequest;
-import com.github.vitalibo.a3c.provisioner.model.ExternalTableResponse;
+import com.github.vitalibo.a3c.provisioner.model.TableData;
+import com.github.vitalibo.a3c.provisioner.model.TableProperties;
 import com.github.vitalibo.a3c.provisioner.model.transform.EncryptionConfigurationTranslator;
 import com.github.vitalibo.a3c.provisioner.model.transform.QueryStringTranslator;
 import lombok.RequiredArgsConstructor;
@@ -15,30 +15,30 @@ import java.util.Collection;
 import java.util.function.BiConsumer;
 
 @RequiredArgsConstructor
-public class UpdateExternalTableFacade implements UpdateFacade<ExternalTableRequest, ExternalTableResponse> {
+public class UpdateTableFacade implements UpdateFacade<TableProperties, TableData> {
 
-    private final Collection<BiConsumer<ExternalTableRequest, ExternalTableRequest>> rules;
+    private final Collection<BiConsumer<TableProperties, TableProperties>> rules;
 
     private final AmazonAthenaSync amazonAthena;
     private final String outputLocation;
-    private final QueryStringTranslator<ExternalTableRequest> createTableQueryTranslator;
-    private final QueryStringTranslator<ExternalTableRequest> dropTableQueryTranslator;
+    private final QueryStringTranslator<TableProperties> createTableQueryTranslator;
+    private final QueryStringTranslator<TableProperties> dropTableQueryTranslator;
 
     @Override
-    public ExternalTableResponse update(ExternalTableRequest request, ExternalTableRequest oldRequest,
-                                        String physicalResourceId) throws AthenaResourceProvisionException {
-        rules.forEach(rule -> rule.accept(request, oldRequest));
+    public TableData update(TableProperties properties, TableProperties oldProperties,
+                            String physicalResourceId) throws AthenaResourceProvisionException {
+        rules.forEach(rule -> rule.accept(properties, oldProperties));
 
-        if (request.getName().equals(physicalResourceId)) {
+        if (properties.getName().equals(physicalResourceId)) {
             String queryExecutionId = amazonAthena.startQueryExecution(
                 new StartQueryExecutionRequest()
-                    .withQueryString(dropTableQueryTranslator.from(oldRequest))
+                    .withQueryString(dropTableQueryTranslator.from(oldProperties))
                     .withQueryExecutionContext(new QueryExecutionContext()
-                        .withDatabase(oldRequest.getDatabaseName()))
+                        .withDatabase(oldProperties.getDatabaseName()))
                     .withResultConfiguration(new ResultConfiguration()
                         .withOutputLocation(outputLocation)
                         .withEncryptionConfiguration(
-                            EncryptionConfigurationTranslator.from(request))))
+                            EncryptionConfigurationTranslator.from(properties))))
                 .getQueryExecutionId();
 
             amazonAthena.waitQueryExecution(queryExecutionId);
@@ -46,20 +46,20 @@ public class UpdateExternalTableFacade implements UpdateFacade<ExternalTableRequ
 
         String queryExecutionId = amazonAthena.startQueryExecution(
             new StartQueryExecutionRequest()
-                .withQueryString(createTableQueryTranslator.from(request))
+                .withQueryString(createTableQueryTranslator.from(properties))
                 .withQueryExecutionContext(new QueryExecutionContext()
-                    .withDatabase(request.getDatabaseName()))
+                    .withDatabase(properties.getDatabaseName()))
                 .withResultConfiguration(new ResultConfiguration()
                     .withOutputLocation(outputLocation)
                     .withEncryptionConfiguration(
-                        EncryptionConfigurationTranslator.from(request))))
+                        EncryptionConfigurationTranslator.from(properties))))
             .getQueryExecutionId();
 
         amazonAthena.waitQueryExecution(queryExecutionId);
 
-        ExternalTableResponse response = new ExternalTableResponse();
-        response.setPhysicalResourceId(request.getName());
-        return response;
+        TableData data = new TableData();
+        data.setPhysicalResourceId(properties.getName());
+        return data;
     }
 
 }

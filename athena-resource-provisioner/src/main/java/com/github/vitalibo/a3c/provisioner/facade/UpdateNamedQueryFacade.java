@@ -8,8 +8,8 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.util.StringUtils;
 import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
-import com.github.vitalibo.a3c.provisioner.model.NamedQueryRequest;
-import com.github.vitalibo.a3c.provisioner.model.NamedQueryResponse;
+import com.github.vitalibo.a3c.provisioner.model.NamedQueryData;
+import com.github.vitalibo.a3c.provisioner.model.NamedQueryProperties;
 import lombok.AllArgsConstructor;
 
 import java.io.BufferedReader;
@@ -19,31 +19,31 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
-public class UpdateNamedQueryFacade implements UpdateFacade<NamedQueryRequest, NamedQueryResponse> {
+public class UpdateNamedQueryFacade implements UpdateFacade<NamedQueryProperties, NamedQueryData> {
 
-    private final Collection<BiConsumer<NamedQueryRequest, NamedQueryRequest>> rules;
+    private final Collection<BiConsumer<NamedQueryProperties, NamedQueryProperties>> rules;
 
     private final AmazonAthena amazonAthena;
     private final AmazonS3 amazonS3;
 
     @Override
-    public NamedQueryResponse update(NamedQueryRequest request, NamedQueryRequest oldRequest,
-                                     String physicalResourceId) throws AthenaResourceProvisionException {
-        rules.forEach(rule -> rule.accept(request, oldRequest));
+    public NamedQueryData update(NamedQueryProperties properties, NamedQueryProperties oldProperties,
+                                 String physicalResourceId) throws AthenaResourceProvisionException {
+        rules.forEach(rule -> rule.accept(properties, oldProperties));
 
         CreateNamedQueryResult result = amazonAthena.createNamedQuery(new CreateNamedQueryRequest()
-            .withDatabase(request.getDatabase())
-            .withQueryString(asQueryString(request.getQuery()))
-            .withDescription(request.getDescription())
-            .withName(request.getName()));
+            .withDatabase(properties.getDatabase())
+            .withQueryString(asQueryString(properties.getQuery()))
+            .withDescription(properties.getDescription())
+            .withName(properties.getName()));
 
-        NamedQueryResponse response = new NamedQueryResponse();
-        response.setQueryId(result.getNamedQueryId());
-        response.setPhysicalResourceId(result.getNamedQueryId());
-        return response;
+        NamedQueryData data = new NamedQueryData();
+        data.setQueryId(result.getNamedQueryId());
+        data.setPhysicalResourceId(result.getNamedQueryId());
+        return data;
     }
 
-    private String asQueryString(NamedQueryRequest.Query query) {
+    private String asQueryString(NamedQueryProperties.Query query) {
         String queryString = query.getQueryString();
         if (!StringUtils.isNullOrEmpty(queryString)) {
             return queryString;

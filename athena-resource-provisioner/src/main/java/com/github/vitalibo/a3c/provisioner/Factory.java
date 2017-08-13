@@ -53,8 +53,8 @@ public class Factory {
                     new AmazonAthenaSync(amazonAthena),
                     outputLocation,
                     makeQueryStringTranslator("CreateDatabaseQuery"));
-            case ExternalTable:
-                return new CreateExternalTableFacade(
+            case Table:
+                return new CreateTableFacade(
                     Collections.emptyList(),
                     new AmazonAthenaSync(amazonAthena),
                     outputLocation,
@@ -73,8 +73,8 @@ public class Factory {
                     new AmazonAthenaSync(amazonAthena),
                     outputLocation,
                     makeQueryStringTranslator("DropDatabaseQuery"));
-            case ExternalTable:
-                return new DeleteExternalTableFacade(
+            case Table:
+                return new DeleteTableFacade(
                     new AmazonAthenaSync(amazonAthena),
                     outputLocation,
                     makeQueryStringTranslator("DropTableQuery"));
@@ -97,8 +97,8 @@ public class Factory {
                     outputLocation,
                     makeQueryStringTranslator("CreateDatabaseQuery"),
                     makeQueryStringTranslator("UpdateDatabasePropertiesQuery"));
-            case ExternalTable:
-                return new UpdateExternalTableFacade(
+            case Table:
+                return new UpdateTableFacade(
                     Collections.emptyList(),
                     new AmazonAthenaSync(amazonAthena),
                     outputLocation,

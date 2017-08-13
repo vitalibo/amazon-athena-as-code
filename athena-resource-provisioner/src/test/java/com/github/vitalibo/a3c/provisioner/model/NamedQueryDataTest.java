@@ -5,11 +5,11 @@ import com.github.vitalibo.a3c.provisioner.util.Jackson;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class NamedQueryResponseTest {
+public class NamedQueryDataTest {
 
     @Test
     public void testToJson() {
-        NamedQueryResponse response = new NamedQueryResponse();
+        NamedQueryData response = new NamedQueryData();
         response.setPhysicalResourceId("required vendor-defined physical id that is unique for that vendor");
         response.setQueryId("the unique identifier of the query");
 

@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 public class DeleteFacadeTest {
 
     @Spy
-    private DeleteFacade<ResourceProperties, NamedQueryResponse> spyCreateFacade;
+    private DeleteFacade<ResourceProperties, NamedQueryData> spyCreateFacade;
     @Captor
     private ArgumentCaptor<ResourceProperties> namedQueryRequestCaptor;
 
@@ -25,14 +25,14 @@ public class DeleteFacadeTest {
     public void testProcess() throws AthenaResourceProvisionException {
         Object namedQueryRequest = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/Athena/NamedQuery/Request.json"), Object.class);
-        NamedQueryResponse namedQueryResponse = Jackson.fromJsonString(
-            TestHelper.resourceAsJsonString("/Athena/NamedQuery/Response.json"), NamedQueryResponse.class);
+        NamedQueryData namedQueryData = Jackson.fromJsonString(
+            TestHelper.resourceAsJsonString("/Athena/NamedQuery/Response.json"), NamedQueryData.class);
         ResourceProviderRequest resourceProviderRequest = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/CloudFormation/Request.json"), ResourceProviderRequest.class);
         resourceProviderRequest.setResourceType(ResourceType.NamedQuery);
         resourceProviderRequest.setResourceProperties(namedQueryRequest);
         Mockito.when(spyCreateFacade.delete(Mockito.any(ResourceProperties.class), Mockito.eq(resourceProviderRequest.getPhysicalResourceId())))
-            .thenReturn(namedQueryResponse);
+            .thenReturn(namedQueryData);
 
         ResourceProviderResponse actual = spyCreateFacade.process(resourceProviderRequest);
 
@@ -41,10 +41,10 @@ public class DeleteFacadeTest {
         Assert.assertEquals(actual.getLogicalResourceId(), resourceProviderRequest.getLogicalResourceId());
         Assert.assertEquals(actual.getRequestId(), resourceProviderRequest.getRequestId());
         Assert.assertEquals(actual.getStackId(), resourceProviderRequest.getStackId());
-        Assert.assertEquals(actual.getPhysicalResourceId(), namedQueryResponse.getPhysicalResourceId());
-        Assert.assertEquals(actual.getData(), namedQueryResponse);
+        Assert.assertEquals(actual.getPhysicalResourceId(), namedQueryData.getPhysicalResourceId());
+        Assert.assertEquals(actual.getData(), namedQueryData);
         Mockito.verify(spyCreateFacade).delete(namedQueryRequestCaptor.capture(), Mockito.eq(resourceProviderRequest.getPhysicalResourceId()));
-        Assert.assertEquals(namedQueryRequestCaptor.getValue(), Jackson.convertValue(namedQueryRequest, NamedQueryRequest.class));
+        Assert.assertEquals(namedQueryRequestCaptor.getValue(), Jackson.convertValue(namedQueryRequest, NamedQueryProperties.class));
     }
 
 }

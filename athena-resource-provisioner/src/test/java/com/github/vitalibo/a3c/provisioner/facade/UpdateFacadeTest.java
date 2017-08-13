@@ -14,7 +14,7 @@ import java.util.Collections;
 public class UpdateFacadeTest {
 
     @Spy
-    private UpdateFacade<ResourceProperties, NamedQueryResponse> spyCreateFacade;
+    private UpdateFacade<ResourceProperties, NamedQueryData> spyCreateFacade;
     @Captor
     private ArgumentCaptor<ResourceProperties> namedQueryRequestCaptor;
     @Captor
@@ -30,9 +30,9 @@ public class UpdateFacadeTest {
         Object namedQueryRequest = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/Athena/NamedQuery/Request.json"), Object.class);
         Object newNamedQueryRequest = makeNewNamedQueryRequest(Jackson.fromJsonString(
-            TestHelper.resourceAsJsonString("/Athena/NamedQuery/Request.json"), NamedQueryRequest.class));
-        NamedQueryResponse namedQueryResponse = Jackson.fromJsonString(
-            TestHelper.resourceAsJsonString("/Athena/NamedQuery/Response.json"), NamedQueryResponse.class);
+            TestHelper.resourceAsJsonString("/Athena/NamedQuery/Request.json"), NamedQueryProperties.class));
+        NamedQueryData namedQueryData = Jackson.fromJsonString(
+            TestHelper.resourceAsJsonString("/Athena/NamedQuery/Response.json"), NamedQueryData.class);
         ResourceProviderRequest resourceProviderRequest = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/CloudFormation/Request.json"), ResourceProviderRequest.class);
         resourceProviderRequest.setResourceType(ResourceType.NamedQuery);
@@ -40,7 +40,7 @@ public class UpdateFacadeTest {
         resourceProviderRequest.setOldResourceProperties(namedQueryRequest);
         Mockito.when(spyCreateFacade.update(
             Mockito.any(ResourceProperties.class), Mockito.any(ResourceProperties.class),
-            Mockito.eq(resourceProviderRequest.getPhysicalResourceId()))).thenReturn(namedQueryResponse);
+            Mockito.eq(resourceProviderRequest.getPhysicalResourceId()))).thenReturn(namedQueryData);
 
         ResourceProviderResponse actual = spyCreateFacade.process(resourceProviderRequest);
 
@@ -49,13 +49,13 @@ public class UpdateFacadeTest {
         Assert.assertEquals(actual.getLogicalResourceId(), resourceProviderRequest.getLogicalResourceId());
         Assert.assertEquals(actual.getRequestId(), resourceProviderRequest.getRequestId());
         Assert.assertEquals(actual.getStackId(), resourceProviderRequest.getStackId());
-        Assert.assertEquals(actual.getPhysicalResourceId(), namedQueryResponse.getPhysicalResourceId());
-        Assert.assertEquals(actual.getData(), namedQueryResponse);
+        Assert.assertEquals(actual.getPhysicalResourceId(), namedQueryData.getPhysicalResourceId());
+        Assert.assertEquals(actual.getData(), namedQueryData);
         Mockito.verify(spyCreateFacade).update(
             newNamedQueryRequestCaptor.capture(), namedQueryRequestCaptor.capture(),
             Mockito.eq(resourceProviderRequest.getPhysicalResourceId()));
-        Assert.assertEquals(namedQueryRequestCaptor.getValue(), Jackson.convertValue(namedQueryRequest, NamedQueryRequest.class));
-        Assert.assertEquals(newNamedQueryRequestCaptor.getValue(), Jackson.convertValue(newNamedQueryRequest, NamedQueryRequest.class));
+        Assert.assertEquals(namedQueryRequestCaptor.getValue(), Jackson.convertValue(namedQueryRequest, NamedQueryProperties.class));
+        Assert.assertEquals(newNamedQueryRequestCaptor.getValue(), Jackson.convertValue(newNamedQueryRequest, NamedQueryProperties.class));
     }
 
 
@@ -91,14 +91,14 @@ public class UpdateFacadeTest {
         Mockito.verify(spyCreateFacade, Mockito.never()).update(Mockito.any(), Mockito.any(), Mockito.any());
     }
 
-    private static Object makeNewNamedQueryRequest(NamedQueryRequest oldNamedQueryRequest) {
-        NamedQueryRequest namedQueryRequest = new NamedQueryRequest();
-        namedQueryRequest.setName(oldNamedQueryRequest.getName() + "-new");
-        namedQueryRequest.setDescription(oldNamedQueryRequest.getDescription() + "-new");
-        namedQueryRequest.setQuery(new NamedQueryRequest.Query());
-        namedQueryRequest.getQuery().setQueryString(oldNamedQueryRequest.getQuery().getQueryString() + "-new");
+    private static Object makeNewNamedQueryRequest(NamedQueryProperties oldNamedQueryProperties) {
+        NamedQueryProperties namedQueryProperties = new NamedQueryProperties();
+        namedQueryProperties.setName(oldNamedQueryProperties.getName() + "-new");
+        namedQueryProperties.setDescription(oldNamedQueryProperties.getDescription() + "-new");
+        namedQueryProperties.setQuery(new NamedQueryProperties.Query());
+        namedQueryProperties.getQuery().setQueryString(oldNamedQueryProperties.getQuery().getQueryString() + "-new");
         return Jackson.fromJsonString(
-            Jackson.toJsonString(namedQueryRequest), Object.class);
+            Jackson.toJsonString(namedQueryProperties), Object.class);
     }
 
 }

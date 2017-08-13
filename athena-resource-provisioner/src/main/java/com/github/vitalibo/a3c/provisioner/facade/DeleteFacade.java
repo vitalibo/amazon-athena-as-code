@@ -5,27 +5,27 @@ import com.github.vitalibo.a3c.provisioner.Facade;
 import com.github.vitalibo.a3c.provisioner.model.*;
 import com.github.vitalibo.a3c.provisioner.model.transform.ResourcePropertiesTranslator;
 
-public interface DeleteFacade<Request extends ResourceProperties, Response extends ResourceData> extends Facade {
+public interface DeleteFacade<Properties extends ResourceProperties, Data extends ResourceData> extends Facade {
 
     @Override
     @SuppressWarnings("unchecked")
     default ResourceProviderResponse process(ResourceProviderRequest request) throws AthenaResourceProvisionException {
-        final Request resourceProperties =
+        final Properties resourceProperties =
             ResourcePropertiesTranslator.of(request.getResourceType())
                 .from(request.getResourceProperties());
 
-        final Response response = delete(resourceProperties, request.getPhysicalResourceId());
+        final Data resourceData = delete(resourceProperties, request.getPhysicalResourceId());
 
         return ResourceProviderResponse.builder()
             .status(Status.SUCCESS)
             .logicalResourceId(request.getLogicalResourceId())
             .requestId(request.getRequestId())
             .stackId(request.getStackId())
-            .physicalResourceId(response.getPhysicalResourceId())
-            .data(response)
+            .physicalResourceId(resourceData.getPhysicalResourceId())
+            .data(resourceData)
             .build();
     }
 
-    Response delete(Request request, String physicalResourceId) throws AthenaResourceProvisionException;
+    Data delete(Properties properties, String physicalResourceId) throws AthenaResourceProvisionException;
 
 }

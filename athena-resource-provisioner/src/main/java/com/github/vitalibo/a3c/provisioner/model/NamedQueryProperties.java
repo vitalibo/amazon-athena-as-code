@@ -4,30 +4,30 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class NamedQueryRequest extends ResourceProperties {
+public class NamedQueryProperties extends ResourceProperties {
 
-    @JsonProperty("Name")
+    @JsonProperty(value = "Name")
     private String name;
 
-    @JsonProperty("Description")
+    @JsonProperty(value = "Description")
     private String description;
 
-    @JsonProperty("Database")
+    @JsonProperty(value = "Database")
     private String database;
 
-    @JsonProperty("Query")
+    @JsonProperty(value = "Query")
     private Query query;
 
     @Data
     public static class Query {
 
-        @JsonProperty("S3Bucket")
+        @JsonProperty(value = "S3Bucket")
         private String s3Bucket;
 
-        @JsonProperty("S3Key")
+        @JsonProperty(value = "S3Key")
         private String s3Key;
 
-        @JsonProperty("QueryString")
+        @JsonProperty(value = "QueryString")
         private String queryString;
 
     }

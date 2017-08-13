@@ -4,8 +4,8 @@ import com.amazonaws.services.athena.model.ResultConfiguration;
 import com.amazonaws.services.athena.model.StartQueryExecutionRequest;
 import com.github.vitalibo.a3c.provisioner.AmazonAthenaSync;
 import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
-import com.github.vitalibo.a3c.provisioner.model.DatabaseRequest;
-import com.github.vitalibo.a3c.provisioner.model.DatabaseResponse;
+import com.github.vitalibo.a3c.provisioner.model.DatabaseData;
+import com.github.vitalibo.a3c.provisioner.model.DatabaseProperties;
 import com.github.vitalibo.a3c.provisioner.model.transform.QueryStringTranslator;
 import lombok.RequiredArgsConstructor;
 
@@ -13,37 +13,37 @@ import java.util.Collection;
 import java.util.function.BiConsumer;
 
 @RequiredArgsConstructor
-public class UpdateDatabaseFacade implements UpdateFacade<DatabaseRequest, DatabaseResponse> {
+public class UpdateDatabaseFacade implements UpdateFacade<DatabaseProperties, DatabaseData> {
 
-    private final Collection<BiConsumer<DatabaseRequest, DatabaseRequest>> rules;
+    private final Collection<BiConsumer<DatabaseProperties, DatabaseProperties>> rules;
 
     private final AmazonAthenaSync amazonAthena;
     private final String outputLocation;
-    private final QueryStringTranslator<DatabaseRequest> createDatabaseQueryTranslator;
-    private final QueryStringTranslator<DatabaseRequest> updateDatabasePropertiesQueryTranslator;
+    private final QueryStringTranslator<DatabaseProperties> createDatabaseQueryTranslator;
+    private final QueryStringTranslator<DatabaseProperties> updateDatabasePropertiesQueryTranslator;
 
     @Override
-    public DatabaseResponse update(DatabaseRequest request, DatabaseRequest oldRequest,
-                                   String physicalResourceId) throws AthenaResourceProvisionException {
-        rules.forEach(rule -> rule.accept(request, oldRequest));
+    public DatabaseData update(DatabaseProperties properties, DatabaseProperties oldProperties,
+                               String physicalResourceId) throws AthenaResourceProvisionException {
+        rules.forEach(rule -> rule.accept(properties, oldProperties));
 
         final String queryExecutionId = amazonAthena.startQueryExecution(
             new StartQueryExecutionRequest()
                 .withQueryString(
-                    chooseQueryStringTranslatorStrategy(request.getName(), physicalResourceId).from(request))
+                    chooseQueryStringTranslatorStrategy(properties.getName(), physicalResourceId).from(properties))
                 .withResultConfiguration(new ResultConfiguration()
                     .withOutputLocation(outputLocation)))
             .getQueryExecutionId();
 
         amazonAthena.waitQueryExecution(queryExecutionId);
 
-        DatabaseResponse response = new DatabaseResponse();
-        response.setPhysicalResourceId(request.getName());
-        return response;
+        DatabaseData data = new DatabaseData();
+        data.setPhysicalResourceId(properties.getName());
+        return data;
     }
 
-    private QueryStringTranslator<DatabaseRequest> chooseQueryStringTranslatorStrategy(String databaseName,
-                                                                                       String physicalResourceId) {
+    private QueryStringTranslator<DatabaseProperties> chooseQueryStringTranslatorStrategy(String databaseName,
+                                                                                          String physicalResourceId) {
         return databaseName.equals(physicalResourceId) ?
             updateDatabasePropertiesQueryTranslator : createDatabaseQueryTranslator;
     }

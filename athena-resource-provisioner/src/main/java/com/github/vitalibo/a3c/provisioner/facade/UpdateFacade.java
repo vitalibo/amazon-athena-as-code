@@ -5,16 +5,16 @@ import com.github.vitalibo.a3c.provisioner.Facade;
 import com.github.vitalibo.a3c.provisioner.model.*;
 import com.github.vitalibo.a3c.provisioner.model.transform.ResourcePropertiesTranslator;
 
-public interface UpdateFacade<Request extends ResourceProperties, Response extends ResourceData> extends Facade {
+public interface UpdateFacade<Properties extends ResourceProperties, Data extends ResourceData> extends Facade {
 
     @Override
     @SuppressWarnings("unchecked")
     default ResourceProviderResponse process(ResourceProviderRequest request) throws AthenaResourceProvisionException {
-        final Request resourceProperties =
+        final Properties resourceProperties =
             ResourcePropertiesTranslator.of(request.getResourceType())
                 .from(request.getResourceProperties());
 
-        final Request oldResourceProperties;
+        final Properties oldResourceProperties;
         try {
             oldResourceProperties =
                 ResourcePropertiesTranslator.of(request.getResourceType())
@@ -31,7 +31,7 @@ public interface UpdateFacade<Request extends ResourceProperties, Response exten
                 .build();
         }
 
-        final Response response = update(
+        final Data resourceData = update(
             resourceProperties, oldResourceProperties, request.getPhysicalResourceId());
 
         return ResourceProviderResponse.builder()
@@ -39,11 +39,11 @@ public interface UpdateFacade<Request extends ResourceProperties, Response exten
             .logicalResourceId(request.getLogicalResourceId())
             .requestId(request.getRequestId())
             .stackId(request.getStackId())
-            .physicalResourceId(response.getPhysicalResourceId())
-            .data(response)
+            .physicalResourceId(resourceData.getPhysicalResourceId())
+            .data(resourceData)
             .build();
     }
 
-    Response update(Request request, Request oldResourceRequest, String physicalResourceId) throws AthenaResourceProvisionException;
+    Data update(Properties properties, Properties oldProperties, String physicalResourceId) throws AthenaResourceProvisionException;
 
 }

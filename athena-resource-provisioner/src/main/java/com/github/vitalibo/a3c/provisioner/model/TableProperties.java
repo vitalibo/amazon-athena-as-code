@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ExternalTableRequest extends ResourceProperties {
+public class TableProperties extends ResourceProperties {
 
     @JsonProperty(value = "Name")
     private String name;

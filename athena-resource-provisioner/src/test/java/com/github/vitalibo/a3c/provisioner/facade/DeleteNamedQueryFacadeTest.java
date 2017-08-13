@@ -4,8 +4,8 @@ import com.amazonaws.services.athena.AmazonAthena;
 import com.amazonaws.services.athena.model.DeleteNamedQueryRequest;
 import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
 import com.github.vitalibo.a3c.provisioner.TestHelper;
-import com.github.vitalibo.a3c.provisioner.model.NamedQueryRequest;
-import com.github.vitalibo.a3c.provisioner.model.NamedQueryResponse;
+import com.github.vitalibo.a3c.provisioner.model.NamedQueryProperties;
+import com.github.vitalibo.a3c.provisioner.model.NamedQueryData;
 import com.github.vitalibo.a3c.provisioner.util.Jackson;
 import org.mockito.*;
 import org.testng.Assert;
@@ -29,10 +29,10 @@ public class DeleteNamedQueryFacadeTest {
 
     @Test
     public void testDelete() throws AthenaResourceProvisionException {
-        NamedQueryRequest namedQueryRequest = Jackson.fromJsonString(
-            TestHelper.resourceAsJsonString("/Athena/NamedQuery/Request.json"), NamedQueryRequest.class);
+        NamedQueryProperties namedQueryProperties = Jackson.fromJsonString(
+            TestHelper.resourceAsJsonString("/Athena/NamedQuery/Request.json"), NamedQueryProperties.class);
 
-        NamedQueryResponse actual = facade.delete(namedQueryRequest, "physical-resource-id");
+        NamedQueryData actual = facade.delete(namedQueryProperties, "physical-resource-id");
 
         Assert.assertNotNull(actual);
         Assert.assertNull(actual.getQueryId());

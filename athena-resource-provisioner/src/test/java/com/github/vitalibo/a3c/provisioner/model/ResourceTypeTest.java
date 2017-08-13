@@ -9,7 +9,8 @@ public class ResourceTypeTest {
     @DataProvider
     public Object[][] samplesKnownResourceTypes() {
         return new Object[][]{
-            {"Custom::AthenaNamedQuery"}
+            {"Custom::AthenaNamedQuery"}, {"Custom::AthenaDatabase"},
+            {"Custom::AthenaTable"}
         };
     }
 

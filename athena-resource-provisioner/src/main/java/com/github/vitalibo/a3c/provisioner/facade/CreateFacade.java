@@ -5,27 +5,27 @@ import com.github.vitalibo.a3c.provisioner.Facade;
 import com.github.vitalibo.a3c.provisioner.model.*;
 import com.github.vitalibo.a3c.provisioner.model.transform.ResourcePropertiesTranslator;
 
-public interface CreateFacade<Request extends ResourceProperties, Response extends ResourceData> extends Facade {
+public interface CreateFacade<Properties extends ResourceProperties, Data extends ResourceData> extends Facade {
 
     @Override
     @SuppressWarnings("unchecked")
     default ResourceProviderResponse process(ResourceProviderRequest request) throws AthenaResourceProvisionException {
-        final Request resourceProperties =
+        final Properties resourceProperties =
             ResourcePropertiesTranslator.of(request.getResourceType())
                 .from(request.getResourceProperties());
 
-        final Response response = create(resourceProperties);
+        final Data resourceData = create(resourceProperties);
 
         return ResourceProviderResponse.builder()
             .status(Status.SUCCESS)
             .logicalResourceId(request.getLogicalResourceId())
             .requestId(request.getRequestId())
             .stackId(request.getStackId())
-            .physicalResourceId(response.getPhysicalResourceId())
-            .data(response)
+            .physicalResourceId(resourceData.getPhysicalResourceId())
+            .data(resourceData)
             .build();
     }
 
-    Response create(Request request) throws AthenaResourceProvisionException;
+    Data create(Properties properties) throws AthenaResourceProvisionException;
 
 }

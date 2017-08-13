@@ -13,9 +13,9 @@ import java.util.stream.Stream;
 public enum ResourceType {
 
     Unknown(null, ResourceProperties.class),
-    NamedQuery("Custom::AthenaNamedQuery", NamedQueryRequest.class),
-    Database("Custom::AthenaDatabase", DatabaseRequest.class),
-    ExternalTable("Custom::AthenaExternalTable", ExternalTableRequest.class);
+    NamedQuery("Custom::AthenaNamedQuery", NamedQueryProperties.class),
+    Database("Custom::AthenaDatabase", DatabaseProperties.class),
+    Table("Custom::AthenaTable", TableProperties.class);
 
     @Getter(onMethod = @__(@JsonValue))
     private final String name;
