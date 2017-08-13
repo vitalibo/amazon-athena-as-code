@@ -58,6 +58,12 @@ public class ExternalTableRequest extends ResourceProperties {
         @JsonProperty(value = "Properties")
         private List<Property> properties;
 
+        @JsonProperty(value = "EncryptionOption")
+        private String encryptionOption;
+
+        @JsonProperty(value = "KMSKey")
+        private String kmsKey;
+
     }
 
 }

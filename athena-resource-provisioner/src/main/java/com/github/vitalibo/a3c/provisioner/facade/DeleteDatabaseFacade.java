@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class DeleteDatabaseFacade implements DeleteFacade<DatabaseRequest, DatabaseResponse> {
 
     private final AmazonAthenaSync amazonAthena;
-    private final ResultConfiguration athenaResultConfiguration;
+    private final String outputLocation;
     private final QueryStringTranslator<DatabaseRequest> dropDatabaseQueryTranslator;
 
     @Override
@@ -21,7 +21,8 @@ public class DeleteDatabaseFacade implements DeleteFacade<DatabaseRequest, Datab
         String queryExecutionId = amazonAthena.startQueryExecution(
             new StartQueryExecutionRequest()
                 .withQueryString(dropDatabaseQueryTranslator.from(request))
-                .withResultConfiguration(athenaResultConfiguration))
+                .withResultConfiguration(new ResultConfiguration()
+                    .withOutputLocation(outputLocation)))
             .getQueryExecutionId();
 
         amazonAthena.waitQueryExecution(queryExecutionId);

@@ -7,6 +7,7 @@ import com.github.vitalibo.a3c.provisioner.AmazonAthenaSync;
 import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
 import com.github.vitalibo.a3c.provisioner.model.ExternalTableRequest;
 import com.github.vitalibo.a3c.provisioner.model.ExternalTableResponse;
+import com.github.vitalibo.a3c.provisioner.model.transform.EncryptionConfigurationTranslator;
 import com.github.vitalibo.a3c.provisioner.model.transform.QueryStringTranslator;
 import lombok.RequiredArgsConstructor;
 
@@ -14,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class DeleteExternalTableFacade implements DeleteFacade<ExternalTableRequest, ExternalTableResponse> {
 
     private final AmazonAthenaSync amazonAthena;
-    private final ResultConfiguration athenaResultConfiguration;
+    private final String outputLocation;
     private final QueryStringTranslator<ExternalTableRequest> dropTableQueryTranslator;
 
     @Override
@@ -24,7 +25,10 @@ public class DeleteExternalTableFacade implements DeleteFacade<ExternalTableRequ
                 .withQueryString(dropTableQueryTranslator.from(request))
                 .withQueryExecutionContext(new QueryExecutionContext()
                     .withDatabase(request.getDatabaseName()))
-                .withResultConfiguration(athenaResultConfiguration))
+                .withResultConfiguration(new ResultConfiguration()
+                    .withOutputLocation(outputLocation)
+                    .withEncryptionConfiguration(
+                        EncryptionConfigurationTranslator.from(request))))
             .getQueryExecutionId();
 
         amazonAthena.waitQueryExecution(queryExecutionId);

@@ -18,7 +18,7 @@ public class UpdateDatabaseFacade implements UpdateFacade<DatabaseRequest, Datab
     private final Collection<BiConsumer<DatabaseRequest, DatabaseRequest>> rules;
 
     private final AmazonAthenaSync amazonAthena;
-    private final ResultConfiguration athenaResultConfiguration;
+    private final String outputLocation;
     private final QueryStringTranslator<DatabaseRequest> createDatabaseQueryTranslator;
     private final QueryStringTranslator<DatabaseRequest> updateDatabasePropertiesQueryTranslator;
 
@@ -31,7 +31,8 @@ public class UpdateDatabaseFacade implements UpdateFacade<DatabaseRequest, Datab
             new StartQueryExecutionRequest()
                 .withQueryString(
                     chooseQueryStringTranslatorStrategy(request.getName(), physicalResourceId).from(request))
-                .withResultConfiguration(athenaResultConfiguration))
+                .withResultConfiguration(new ResultConfiguration()
+                    .withOutputLocation(outputLocation)))
             .getQueryExecutionId();
 
         amazonAthena.waitQueryExecution(queryExecutionId);

@@ -18,7 +18,7 @@ public class CreateDatabaseFacade implements CreateFacade<DatabaseRequest, Datab
     private final Collection<Consumer<DatabaseRequest>> rules;
 
     private final AmazonAthenaSync amazonAthena;
-    private final ResultConfiguration athenaResultConfiguration;
+    private final String outputLocation;
     private final QueryStringTranslator<DatabaseRequest> createDatabaseQueryTranslator;
 
     @Override
@@ -28,7 +28,8 @@ public class CreateDatabaseFacade implements CreateFacade<DatabaseRequest, Datab
         String queryExecutionId = amazonAthena.startQueryExecution(
             new StartQueryExecutionRequest()
                 .withQueryString(createDatabaseQueryTranslator.from(request))
-                .withResultConfiguration(athenaResultConfiguration))
+                .withResultConfiguration(new ResultConfiguration()
+                    .withOutputLocation(outputLocation)))
             .getQueryExecutionId();
 
         amazonAthena.waitQueryExecution(queryExecutionId);

@@ -7,6 +7,7 @@ import com.github.vitalibo.a3c.provisioner.AmazonAthenaSync;
 import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
 import com.github.vitalibo.a3c.provisioner.model.ExternalTableRequest;
 import com.github.vitalibo.a3c.provisioner.model.ExternalTableResponse;
+import com.github.vitalibo.a3c.provisioner.model.transform.EncryptionConfigurationTranslator;
 import com.github.vitalibo.a3c.provisioner.model.transform.QueryStringTranslator;
 import lombok.RequiredArgsConstructor;
 
@@ -19,7 +20,7 @@ public class UpdateExternalTableFacade implements UpdateFacade<ExternalTableRequ
     private final Collection<BiConsumer<ExternalTableRequest, ExternalTableRequest>> rules;
 
     private final AmazonAthenaSync amazonAthena;
-    private final ResultConfiguration athenaResultConfiguration;
+    private final String outputLocation;
     private final QueryStringTranslator<ExternalTableRequest> createTableQueryTranslator;
     private final QueryStringTranslator<ExternalTableRequest> dropTableQueryTranslator;
 
@@ -34,7 +35,10 @@ public class UpdateExternalTableFacade implements UpdateFacade<ExternalTableRequ
                     .withQueryString(dropTableQueryTranslator.from(oldRequest))
                     .withQueryExecutionContext(new QueryExecutionContext()
                         .withDatabase(oldRequest.getDatabaseName()))
-                    .withResultConfiguration(athenaResultConfiguration))
+                    .withResultConfiguration(new ResultConfiguration()
+                        .withOutputLocation(outputLocation)
+                        .withEncryptionConfiguration(
+                            EncryptionConfigurationTranslator.from(request))))
                 .getQueryExecutionId();
 
             amazonAthena.waitQueryExecution(queryExecutionId);
@@ -45,7 +49,10 @@ public class UpdateExternalTableFacade implements UpdateFacade<ExternalTableRequ
                 .withQueryString(createTableQueryTranslator.from(request))
                 .withQueryExecutionContext(new QueryExecutionContext()
                     .withDatabase(request.getDatabaseName()))
-                .withResultConfiguration(athenaResultConfiguration))
+                .withResultConfiguration(new ResultConfiguration()
+                    .withOutputLocation(outputLocation)
+                    .withEncryptionConfiguration(
+                        EncryptionConfigurationTranslator.from(request))))
             .getQueryExecutionId();
 
         amazonAthena.waitQueryExecution(queryExecutionId);

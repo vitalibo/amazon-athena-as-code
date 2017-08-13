@@ -3,11 +3,8 @@ package com.github.vitalibo.a3c.provisioner;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.athena.AmazonAthena;
 import com.amazonaws.services.athena.AmazonAthenaClient;
-import com.amazonaws.services.athena.model.EncryptionConfiguration;
-import com.amazonaws.services.athena.model.ResultConfiguration;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.util.StringUtils;
 import com.github.vitalibo.a3c.provisioner.facade.*;
 import com.github.vitalibo.a3c.provisioner.model.ResourceProviderRequest;
 import com.github.vitalibo.a3c.provisioner.model.transform.QueryStringTranslator;
@@ -21,14 +18,11 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 
 public class Factory {
 
     private static final String AWS_REGION = "AWS_REGION";
     private static final String ATHENA_RESULT_OUTPUT_LOCATION = "ATHENA_RESULT_OUTPUT_LOCATION";
-    private static final String ATHENA_RESULT_ENCRYPTION_OPTION = "ATHENA_RESULT_ENCRYPTION_OPTION";
-    private static final String ATHENA_RESULT_KMS_KEY = "ATHENA_RESULT_KMS_KEY";
 
     @Getter(lazy = true)
     private static final Factory instance = new Factory(System.getenv());
@@ -36,14 +30,14 @@ public class Factory {
     private final AmazonS3 amazonS3;
     private final AmazonAthena amazonAthena;
     private final Configuration freemarkerConfiguration;
-    private final ResultConfiguration athenaResultConfiguration;
+    private final String outputLocation;
 
     Factory(Map<String, String> env) {
         final Regions region = Regions.fromName(env.get(AWS_REGION));
-        amazonS3 = createAmazonS3(region);
-        amazonAthena = createAmazonAthena(region);
-        freemarkerConfiguration = createConfiguration();
-        athenaResultConfiguration = createResultConfiguration(env);
+        this.amazonS3 = createAmazonS3(region);
+        this.amazonAthena = createAmazonAthena(region);
+        this.freemarkerConfiguration = createConfiguration();
+        this.outputLocation = env.get(ATHENA_RESULT_OUTPUT_LOCATION);
     }
 
     public Facade createCreateFacade(ResourceProviderRequest request) {
@@ -57,13 +51,13 @@ public class Factory {
                 return new CreateDatabaseFacade(
                     Collections.emptyList(),
                     new AmazonAthenaSync(amazonAthena),
-                    athenaResultConfiguration,
+                    outputLocation,
                     makeQueryStringTranslator("CreateDatabaseQuery"));
             case ExternalTable:
                 return new CreateExternalTableFacade(
                     Collections.emptyList(),
                     new AmazonAthenaSync(amazonAthena),
-                    athenaResultConfiguration,
+                    outputLocation,
                     makeQueryStringTranslator("CreateTableQuery"));
             default:
                 throw new IllegalStateException();
@@ -77,12 +71,12 @@ public class Factory {
             case Database:
                 return new DeleteDatabaseFacade(
                     new AmazonAthenaSync(amazonAthena),
-                    athenaResultConfiguration,
+                    outputLocation,
                     makeQueryStringTranslator("DropDatabaseQuery"));
             case ExternalTable:
                 return new DeleteExternalTableFacade(
                     new AmazonAthenaSync(amazonAthena),
-                    athenaResultConfiguration,
+                    outputLocation,
                     makeQueryStringTranslator("DropTableQuery"));
             default:
                 throw new IllegalStateException();
@@ -100,14 +94,14 @@ public class Factory {
                 return new UpdateDatabaseFacade(
                     Collections.emptyList(),
                     new AmazonAthenaSync(amazonAthena),
-                    athenaResultConfiguration,
+                    outputLocation,
                     makeQueryStringTranslator("CreateDatabaseQuery"),
                     makeQueryStringTranslator("UpdateDatabasePropertiesQuery"));
             case ExternalTable:
                 return new UpdateExternalTableFacade(
                     Collections.emptyList(),
                     new AmazonAthenaSync(amazonAthena),
-                    athenaResultConfiguration,
+                    outputLocation,
                     makeQueryStringTranslator("CreateTableQuery"),
                     makeQueryStringTranslator("DropTableQuery"));
             default:
@@ -137,17 +131,6 @@ public class Factory {
         return AmazonAthenaClient.builder()
             .withRegion(region)
             .build();
-    }
-
-    private static ResultConfiguration createResultConfiguration(Map<String, String> env) {
-        return new ResultConfiguration()
-            .withOutputLocation(env.get(ATHENA_RESULT_OUTPUT_LOCATION))
-            .withEncryptionConfiguration(Optional.ofNullable(
-                new EncryptionConfiguration()
-                    .withEncryptionOption(env.get(ATHENA_RESULT_ENCRYPTION_OPTION))
-                    .withKmsKey(env.get(ATHENA_RESULT_KMS_KEY)))
-                .filter(o -> !StringUtils.isNullOrEmpty(o.getEncryptionOption()) && !StringUtils.isNullOrEmpty(o.getKmsKey()))
-                .orElse(null));
     }
 
     private static Configuration createConfiguration() {

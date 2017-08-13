@@ -1,6 +1,5 @@
 package com.github.vitalibo.a3c.provisioner;
 
-
 import com.amazonaws.services.athena.AmazonAthena;
 import com.amazonaws.services.athena.model.GetQueryExecutionRequest;
 import com.amazonaws.services.athena.model.QueryExecutionStatus;
