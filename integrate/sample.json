@@ -11,7 +11,7 @@
       "Type": "Custom::AthenaNamedQuery",
       "Properties": {
         "ServiceToken": {
-          "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:test-cf2"
+          "Fn::ImportValue": "A3CServiceToken"
         },
         "Name": "MyFirstQuery",
         "Description": "This simple query.",
@@ -37,7 +37,7 @@
       "Type": "Custom::AthenaDatabase",
       "Properties": {
         "ServiceToken": {
-          "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:test-cf2"
+          "Fn::ImportValue": "A3CServiceToken"
         },
         "Name": "My_DataBase_Name",
         "Location": {
@@ -60,7 +60,7 @@
       "Type": "Custom::AthenaExternalTable",
       "Properties": {
         "ServiceToken": {
-          "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:test-cf2"
+          "Fn::ImportValue": "A3CServiceToken"
         },
         "Name": "MyTableName",
         "Database": {

@@ -1,23 +1,28 @@
 #!/usr/bin/env bash
 set -e
 
-if [ $# -ne 2 ]; then
-  echo "Usage: $0 [deployment-bucket] [athena-result-output-location]"
+if [ $# -ne 1 ]; then
+  echo "Usage: $0 [conf]"
   echo ''
   echo 'Options:'
-  echo '  deployment-bucket                 S3 bucket name where contains compiled lambdas'
-  echo '  athena-result-output-location     The location in S3 where query results are stored'
+  echo '  conf    The JSON file which contains environment configuration'
   exit 1
 fi
 
-S3_BUCKET=$1
-OUTPUT_LOCATION=$2
+CONFIGURATION=$1
+
+function _get() {
+  jq -r ".[] | select(.ParameterKey == \"$1\") | .ParameterValue" ${CONFIGURATION}
+}
+
+USER=$(_get 'UserName')
+S3_BUCKET=$(_get 'DeploymentBucket')
 
 echo 'Create/Update stack initialized'
-SOURCE_CODE="../athena-resource-provisioner/target/athena-resource-provisioner-1.0-SNAPSHOT.jar"
-MD5=`md5sum ${SOURCE_CODE} | awk '{ print $1 }'`
-aws s3 cp ${SOURCE_CODE} "s3://${S3_BUCKET}/amazon-athena-as-code/${MD5}"
+MODULE='athena-resource-provisioner'
+MD5_SUM=$(md5sum "../${MODULE}/target/${MODULE}-1.0-SNAPSHOT.jar" | awk '{ print $1 }')
+aws s3 cp "../${MODULE}/target/${MODULE}-1.0-SNAPSHOT.jar" "s3://${S3_BUCKET}/${USER}/${MD5_SUM}"
 
-aws cloudformation deploy --template-file 'stack.json' --stack-name "amazon-athena-as-code-infrastructure" \
-  --parameter-overrides DeploymentBucket=${S3_BUCKET} AthenaResultOutputLocation=${OUTPUT_LOCATION} \
-    LambdaCodeSource=${MD5}
+aws cloudformation deploy --template-file 'stack.json' --stack-name "${USER}-infrastructure" \
+  --parameter-overrides UserName=${USER} DeploymentBucket=${S3_BUCKET} \
+    AthenaResultOutputLocation=$(_get 'AthenaResultOutputLocation') LambdaCodeSource=${MD5_SUM}

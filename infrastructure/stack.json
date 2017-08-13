@@ -2,6 +2,11 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "This AWS CloudFormation template Create/Update infrastructure of Amazon Athena as Code service",
   "Parameters": {
+    "UserName": {
+      "Type": "String",
+      "Default": "amazon-athena-as-code",
+      "Description": "User name"
+    },
     "DeploymentBucket": {
       "Type": "String",
       "Description": "S3 bucket name where contains compiled lambdas"
@@ -9,16 +14,6 @@
     "AthenaResultOutputLocation": {
       "Type": "String",
       "Description": "The location in S3 where query results are stored"
-    },
-    "AthenaResultEncryptionOption": {
-      "Type": "String",
-      "Description": "Amazon S3 server-side encryption with Amazon S3-managed keys",
-      "Default": ""
-    },
-    "AthenaResultKMSKey": {
-      "Type": "String",
-      "Description": "This is the KMS key ARN or ID",
-      "Default": ""
     },
     "LambdaCodeSource": {
       "Type": "String",
@@ -34,7 +29,7 @@
             "Ref": "DeploymentBucket"
           },
           "S3Key": {
-            "Fn::Sub": "amazon-athena-as-code/athena-resource-provisioner-1.0-SNAPSHOT.jar"
+            "Fn::Sub": "${UserName}/${LambdaCodeSource}"
           }
         },
         "Description": "AWS CloudFormation custom Amazon Athena resources provisioner",
@@ -42,23 +37,16 @@
           "Variables": {
             "ATHENA_RESULT_OUTPUT_LOCATION": {
               "Ref": "AthenaResultOutputLocation"
-            },
-            "ATHENA_RESULT_ENCRYPTION_OPTION": {
-              "Ref": "AthenaResultEncryptionOption"
-            },
-            "ATHENA_RESULT_KMS_KEY": {
-              "Ref": "AthenaResultKMSKey"
             }
           }
         },
-        "FunctionName": "amazon-athena-as-code-resource-provisioner",
+        "FunctionName": {
+          "Fn::Sub": "${UserName}-resource-provisioner"
+        },
         "Handler": "com.github.vitalibo.a3c.provisioner.LambdaRequestHandler",
         "MemorySize": 512,
         "Role": {
-          "Fn::GetAtt": [
-            "LambdaExecutionRole",
-            "Arn"
-          ]
+          "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/${UserName}-execution-role"
         },
         "Runtime": "java8",
         "Timeout": 90,
@@ -88,46 +76,18 @@
           "Fn::Sub": "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*"
         }
       }
-    },
-    "LambdaExecutionRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "RoleName": "amazon-athena-as-code-execution-role",
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              },
-              "Action": [
-                "sts:AssumeRole"
-              ]
-            }
-          ]
-        },
-        "Policies": [
-          {
-            "PolicyName": "Runtime",
-            "PolicyDocument": {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Effect": "Allow",
-                  "Action": [
-                    "*"
-                  ],
-                  "Resource": [
-                    "*"
-                  ]
-                }
-              ]
-            }
-          }
+    }
+  },
+  "Outputs": {
+    "LambdaArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "LambdaFunction",
+          "Arn"
         ]
+      },
+      "Export": {
+        "Name": "A3CServiceToken"
       }
     }
   }

@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "UserName",
+    "ParameterValue": "amazon-athena-as-code"
+  },
+  {
+    "ParameterKey": "DeploymentBucket",
+    "ParameterValue": "<deployment s3 bucket>"
+  },
+  {
+    "ParameterKey": "AthenaResultOutputLocation",
+    "ParameterValue": "s3://<athena result output location>/"
+  }
+]
