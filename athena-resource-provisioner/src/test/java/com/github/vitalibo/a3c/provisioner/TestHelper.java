@@ -18,7 +18,7 @@ public class TestHelper {
 
     public static String resourceAsString(String resource) {
         return new BufferedReader(new InputStreamReader(TestHelper.class.getResourceAsStream(resource)))
-            .lines().collect(Collectors.joining("\n"));
+            .lines().collect(Collectors.joining(System.lineSeparator()));
     }
 
 }

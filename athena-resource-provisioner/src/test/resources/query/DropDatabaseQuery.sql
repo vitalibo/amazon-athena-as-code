@@ -1,0 +1,1 @@
+DROP DATABASE the database name

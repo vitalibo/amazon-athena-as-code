@@ -1,0 +1,53 @@
+{
+  "Name": "MyTableName",
+  "Database": "DataBaseName",
+  "Schema": [
+    {
+      "Name": "Column1",
+      "DataType": "STRING",
+      "Comment": "Comment #1"
+    },
+    {
+      "Name": "Column2",
+      "DataType": "ARRAY<STRING>"
+    },
+    {
+      "Name": "Column3",
+      "DataType": "TIMESTAMP",
+      "Comment": "Comment #2"
+    }
+  ],
+  "Comment": "This is the Table Comment.",
+  "Partition": [
+    {
+      "Name": "Partition1",
+      "DataType": "TIMESTAMP"
+    },
+    {
+      "Name": "Partition2",
+      "DataType": "STRING",
+      "Comment": "Comment #3"
+    }
+  ],
+  "SerDe": {
+    "RowFormat": "org.openx.data.jsonserde.JsonSerDe",
+    "StoredAs": "TEXTFILE",
+    "Properties": [
+      {
+        "Name": "serialization.format",
+        "Value": "1"
+      }
+    ]
+  },
+  "Location": "aaa",
+  "Properties": [
+    {
+      "Name": "has_encrypted_data",
+      "Value": "false"
+    },
+    {
+      "Name": "Key1",
+      "Value": "Value2"
+    }
+  ]
+}

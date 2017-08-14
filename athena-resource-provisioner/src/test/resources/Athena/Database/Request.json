@@ -1,0 +1,14 @@
+{
+  "Name": "the database name",
+  "Location": "specifies the location where database files and metastore will be stored",
+  "Properties": [
+    {
+      "Name": "custom metadata properties key for the database definition",
+      "Value": "custom metadata properties value for the database definition"
+    },
+    {
+      "Name": "key #2",
+      "Value": "value #2"
+    }
+  ]
+}
