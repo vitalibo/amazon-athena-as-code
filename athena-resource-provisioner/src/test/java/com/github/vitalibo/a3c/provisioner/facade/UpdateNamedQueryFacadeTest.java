@@ -7,7 +7,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
-import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
+import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.TestHelper;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryProperties;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryData;
@@ -43,7 +43,7 @@ public class UpdateNamedQueryFacadeTest {
     }
 
     @Test(expectedExceptions = RuntimeException.class)
-    public void testFailValidation() throws AthenaResourceProvisionException {
+    public void testFailValidation() throws AthenaProvisionException {
         facade = new UpdateNamedQueryFacade(Collections.singletonList((o, a) -> {
             throw new RuntimeException();
         }), mockAmazonAthena, mockAmazonS3);
@@ -52,7 +52,7 @@ public class UpdateNamedQueryFacadeTest {
     }
 
     @Test
-    public void testUpdate() throws AthenaResourceProvisionException {
+    public void testUpdate() throws AthenaProvisionException {
         NamedQueryProperties namedQueryProperties = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/Athena/NamedQuery/Request.json"), NamedQueryProperties.class);
         CreateNamedQueryResult createNamedQueryResult = new CreateNamedQueryResult();
@@ -77,7 +77,7 @@ public class UpdateNamedQueryFacadeTest {
     }
 
     @Test
-    public void testUpdateFromS3() throws AthenaResourceProvisionException {
+    public void testUpdateFromS3() throws AthenaProvisionException {
         NamedQueryProperties namedQueryProperties = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/Athena/NamedQuery/Request.json"), NamedQueryProperties.class);
         CreateNamedQueryResult createNamedQueryResult = new CreateNamedQueryResult();

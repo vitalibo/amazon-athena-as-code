@@ -4,7 +4,7 @@ import com.amazonaws.services.athena.model.QueryExecutionContext;
 import com.amazonaws.services.athena.model.ResultConfiguration;
 import com.amazonaws.services.athena.model.StartQueryExecutionRequest;
 import com.github.vitalibo.a3c.provisioner.AmazonAthenaSync;
-import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
+import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.model.TableData;
 import com.github.vitalibo.a3c.provisioner.model.TableProperties;
 import com.github.vitalibo.a3c.provisioner.model.transform.EncryptionConfigurationTranslator;
@@ -19,7 +19,7 @@ public class DeleteTableFacade implements DeleteFacade<TableProperties, TableDat
     private final QueryStringTranslator<TableProperties> dropTableQueryTranslator;
 
     @Override
-    public TableData delete(TableProperties properties, String physicalResourceId) throws AthenaResourceProvisionException {
+    public TableData delete(TableProperties properties, String physicalResourceId) throws AthenaProvisionException {
         String queryExecutionId = amazonAthena.startQueryExecution(
             new StartQueryExecutionRequest()
                 .withQueryString(dropTableQueryTranslator.from(properties))

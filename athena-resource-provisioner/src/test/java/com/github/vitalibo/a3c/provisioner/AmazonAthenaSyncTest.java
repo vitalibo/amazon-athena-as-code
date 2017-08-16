@@ -41,7 +41,7 @@ public class AmazonAthenaSyncTest {
     }
 
     @Test
-    public void testWaitQueryExecution() throws AthenaResourceProvisionException {
+    public void testWaitQueryExecution() throws AthenaProvisionException {
         Mockito.when(mockAmazonAthena.getQueryExecution(Mockito.any()))
             .thenReturn(makeGetQueryExecutionResult(QueryExecutionState.RUNNING),
                 makeGetQueryExecutionResult(QueryExecutionState.SUCCEEDED));
@@ -53,8 +53,8 @@ public class AmazonAthenaSyncTest {
         Assert.assertEquals(queryExecutionRequest.getQueryExecutionId(), "query-execution-id");
     }
 
-    @Test(expectedExceptions = AthenaResourceProvisionException.class)
-    public void testFailWaitQueryExecution() throws AthenaResourceProvisionException {
+    @Test(expectedExceptions = AthenaProvisionException.class)
+    public void testFailWaitQueryExecution() throws AthenaProvisionException {
         Mockito.when(mockAmazonAthena.getQueryExecution(Mockito.any()))
             .thenReturn(makeGetQueryExecutionResult(QueryExecutionState.RUNNING),
                 makeGetQueryExecutionResult(QueryExecutionState.FAILED));

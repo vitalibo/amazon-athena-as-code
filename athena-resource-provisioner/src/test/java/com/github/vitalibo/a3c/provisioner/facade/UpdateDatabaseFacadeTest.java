@@ -3,7 +3,7 @@ package com.github.vitalibo.a3c.provisioner.facade;
 import com.amazonaws.services.athena.model.StartQueryExecutionRequest;
 import com.amazonaws.services.athena.model.StartQueryExecutionResult;
 import com.github.vitalibo.a3c.provisioner.AmazonAthenaSync;
-import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
+import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.TestHelper;
 import com.github.vitalibo.a3c.provisioner.model.DatabaseData;
 import com.github.vitalibo.a3c.provisioner.model.DatabaseProperties;
@@ -38,7 +38,7 @@ public class UpdateDatabaseFacadeTest {
     }
 
     @Test
-    public void testUpdateCreateStrategy() throws AthenaResourceProvisionException {
+    public void testUpdateCreateStrategy() throws AthenaProvisionException {
         DatabaseProperties databaseProperties = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/Athena/Database/Request.json"), DatabaseProperties.class);
         Mockito.when(mockAmazonAthenaSync.startQueryExecution(Mockito.any()))
@@ -61,7 +61,7 @@ public class UpdateDatabaseFacadeTest {
     }
 
     @Test
-    public void testUpdateUpdateStrategy() throws AthenaResourceProvisionException {
+    public void testUpdateUpdateStrategy() throws AthenaProvisionException {
         DatabaseProperties databaseProperties = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/Athena/Database/Request.json"), DatabaseProperties.class);
         Mockito.when(mockAmazonAthenaSync.startQueryExecution(Mockito.any()))

@@ -50,7 +50,7 @@ public class LambdaRequestHandler implements RequestStreamHandler {
         ResourceProviderResponse response;
         try {
             response = facade.process(request);
-        } catch (AthenaResourceProvisionException e) {
+        } catch (AthenaProvisionException e) {
             response = ResourceProviderResponse.builder()
                 .status(Status.FAILED)
                 .reason(e.getMessage())

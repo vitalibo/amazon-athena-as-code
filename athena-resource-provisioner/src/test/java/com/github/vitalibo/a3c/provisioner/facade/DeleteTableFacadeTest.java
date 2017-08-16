@@ -3,7 +3,7 @@ package com.github.vitalibo.a3c.provisioner.facade;
 import com.amazonaws.services.athena.model.StartQueryExecutionRequest;
 import com.amazonaws.services.athena.model.StartQueryExecutionResult;
 import com.github.vitalibo.a3c.provisioner.AmazonAthenaSync;
-import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
+import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.TestHelper;
 import com.github.vitalibo.a3c.provisioner.model.TableData;
 import com.github.vitalibo.a3c.provisioner.model.TableProperties;
@@ -33,7 +33,7 @@ public class DeleteTableFacadeTest {
     }
 
     @Test
-    public void testDelete() throws AthenaResourceProvisionException {
+    public void testDelete() throws AthenaProvisionException {
         TableProperties tableProperties = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/Athena/Table/Request.json"), TableProperties.class);
         StartQueryExecutionResult startQueryExecutionResult = new StartQueryExecutionResult()

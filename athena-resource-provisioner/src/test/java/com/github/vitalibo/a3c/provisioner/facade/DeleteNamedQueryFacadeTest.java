@@ -2,7 +2,7 @@ package com.github.vitalibo.a3c.provisioner.facade;
 
 import com.amazonaws.services.athena.AmazonAthena;
 import com.amazonaws.services.athena.model.DeleteNamedQueryRequest;
-import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
+import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.TestHelper;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryProperties;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryData;
@@ -28,7 +28,7 @@ public class DeleteNamedQueryFacadeTest {
     }
 
     @Test
-    public void testDelete() throws AthenaResourceProvisionException {
+    public void testDelete() throws AthenaProvisionException {
         NamedQueryProperties namedQueryProperties = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/Athena/NamedQuery/Request.json"), NamedQueryProperties.class);
 

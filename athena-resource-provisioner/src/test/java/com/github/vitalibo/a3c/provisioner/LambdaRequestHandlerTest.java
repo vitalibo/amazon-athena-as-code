@@ -84,7 +84,7 @@ public class LambdaRequestHandlerTest {
             .thenReturn(ResourceProviderResponse.builder()
                 .status(Status.FAILED).build());
         Mockito.when(mockUpdateFacade.process(Mockito.any()))
-            .thenThrow(new AthenaResourceProvisionException());
+            .thenThrow(new AthenaProvisionException());
 
         lambda.handleRequest(new ByteArrayInputStream(resourceProviderRequest), outputStream, mockContext);
 

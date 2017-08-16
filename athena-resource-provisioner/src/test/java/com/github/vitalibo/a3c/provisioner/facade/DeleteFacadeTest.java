@@ -1,6 +1,6 @@
 package com.github.vitalibo.a3c.provisioner.facade;
 
-import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
+import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.TestHelper;
 import com.github.vitalibo.a3c.provisioner.model.*;
 import com.github.vitalibo.a3c.provisioner.util.Jackson;
@@ -22,7 +22,7 @@ public class DeleteFacadeTest {
     }
 
     @Test
-    public void testProcess() throws AthenaResourceProvisionException {
+    public void testProcess() throws AthenaProvisionException {
         Object namedQueryRequest = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/Athena/NamedQuery/Request.json"), Object.class);
         NamedQueryData namedQueryData = Jackson.fromJsonString(

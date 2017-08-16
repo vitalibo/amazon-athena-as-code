@@ -1,6 +1,6 @@
 package com.github.vitalibo.a3c.provisioner.model.transform;
 
-import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
+import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.TestHelper;
 import com.github.vitalibo.a3c.provisioner.model.ResourceProperties;
 import com.github.vitalibo.a3c.provisioner.model.ResourceType;
@@ -13,25 +13,25 @@ import java.util.Collections;
 public class ResourcePropertiesTranslatorTest {
 
     @Test(
-        expectedExceptions = AthenaResourceProvisionException.class,
+        expectedExceptions = AthenaProvisionException.class,
         expectedExceptionsMessageRegExp = "Unknown resource type.")
-    public void testParseUnknownResourceType() throws AthenaResourceProvisionException {
+    public void testParseUnknownResourceType() throws AthenaProvisionException {
         ResourcePropertiesTranslator translator = ResourcePropertiesTranslator.of(ResourceType.Unknown);
 
         translator.from(new Object());
     }
 
     @Test(
-        expectedExceptions = AthenaResourceProvisionException.class,
+        expectedExceptions = AthenaProvisionException.class,
         expectedExceptionsMessageRegExp = "Unrecognized field \"foo\".")
-    public void testUnrecognizedField() throws AthenaResourceProvisionException {
+    public void testUnrecognizedField() throws AthenaProvisionException {
         ResourcePropertiesTranslator translator = ResourcePropertiesTranslator.of(ResourceType.NamedQuery);
 
         translator.from(Collections.singletonMap("foo", "bar"));
     }
 
     @Test
-    public void testTranslate() throws AthenaResourceProvisionException {
+    public void testTranslate() throws AthenaProvisionException {
         String expected = TestHelper.resourceAsJsonString("/Athena/NamedQuery/Request.json");
         ResourcePropertiesTranslator translator = ResourcePropertiesTranslator.of(ResourceType.NamedQuery);
         Object resourceProperties = Jackson.fromJsonString(expected, Object.class);

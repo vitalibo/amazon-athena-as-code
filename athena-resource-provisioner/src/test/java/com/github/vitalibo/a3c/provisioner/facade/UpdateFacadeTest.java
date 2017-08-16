@@ -1,6 +1,6 @@
 package com.github.vitalibo.a3c.provisioner.facade;
 
-import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
+import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.TestHelper;
 import com.github.vitalibo.a3c.provisioner.model.*;
 import com.github.vitalibo.a3c.provisioner.util.Jackson;
@@ -26,7 +26,7 @@ public class UpdateFacadeTest {
     }
 
     @Test
-    public void testProcess() throws AthenaResourceProvisionException {
+    public void testProcess() throws AthenaProvisionException {
         Object namedQueryRequest = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/Athena/NamedQuery/Request.json"), Object.class);
         Object newNamedQueryRequest = makeNewNamedQueryRequest(Jackson.fromJsonString(
@@ -59,8 +59,8 @@ public class UpdateFacadeTest {
     }
 
 
-    @Test(expectedExceptions = AthenaResourceProvisionException.class)
-    public void testFailTranslation() throws AthenaResourceProvisionException {
+    @Test(expectedExceptions = AthenaProvisionException.class)
+    public void testFailTranslation() throws AthenaProvisionException {
         ResourceProviderRequest resourceProviderRequest = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/CloudFormation/Request.json"), ResourceProviderRequest.class);
         resourceProviderRequest.setResourceType(ResourceType.NamedQuery);
@@ -70,7 +70,7 @@ public class UpdateFacadeTest {
     }
 
     @Test
-    public void testUpdateRollbackInProgressAfterFailTranslation() throws AthenaResourceProvisionException {
+    public void testUpdateRollbackInProgressAfterFailTranslation() throws AthenaProvisionException {
         Object namedQueryRequest = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/Athena/NamedQuery/Request.json"), Object.class);
         ResourceProviderRequest resourceProviderRequest = Jackson.fromJsonString(

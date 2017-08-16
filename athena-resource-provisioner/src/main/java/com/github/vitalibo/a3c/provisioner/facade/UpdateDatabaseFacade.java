@@ -3,7 +3,7 @@ package com.github.vitalibo.a3c.provisioner.facade;
 import com.amazonaws.services.athena.model.ResultConfiguration;
 import com.amazonaws.services.athena.model.StartQueryExecutionRequest;
 import com.github.vitalibo.a3c.provisioner.AmazonAthenaSync;
-import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
+import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.model.DatabaseData;
 import com.github.vitalibo.a3c.provisioner.model.DatabaseProperties;
 import com.github.vitalibo.a3c.provisioner.model.transform.QueryStringTranslator;
@@ -24,7 +24,7 @@ public class UpdateDatabaseFacade implements UpdateFacade<DatabaseProperties, Da
 
     @Override
     public DatabaseData update(DatabaseProperties properties, DatabaseProperties oldProperties,
-                               String physicalResourceId) throws AthenaResourceProvisionException {
+                               String physicalResourceId) throws AthenaProvisionException {
         rules.forEach(rule -> rule.accept(properties, oldProperties));
 
         final String queryExecutionId = amazonAthena.startQueryExecution(

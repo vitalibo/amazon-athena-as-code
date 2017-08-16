@@ -7,7 +7,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.util.StringUtils;
-import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
+import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryData;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryProperties;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ public class UpdateNamedQueryFacade implements UpdateFacade<NamedQueryProperties
 
     @Override
     public NamedQueryData update(NamedQueryProperties properties, NamedQueryProperties oldProperties,
-                                 String physicalResourceId) throws AthenaResourceProvisionException {
+                                 String physicalResourceId) throws AthenaProvisionException {
         rules.forEach(rule -> rule.accept(properties, oldProperties));
 
         CreateNamedQueryResult result = amazonAthena.createNamedQuery(new CreateNamedQueryRequest()

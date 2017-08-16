@@ -14,7 +14,7 @@ public class AmazonAthenaSync implements AmazonAthena {
     private final AmazonAthena amazonAthena;
 
     @SneakyThrows(value = InterruptedException.class)
-    public void waitQueryExecution(String queryExecutionId) throws AthenaResourceProvisionException {
+    public void waitQueryExecution(String queryExecutionId) throws AthenaProvisionException {
         QueryExecutionStatus status = amazonAthena.getQueryExecution(
             new GetQueryExecutionRequest()
                 .withQueryExecutionId(queryExecutionId))
@@ -31,7 +31,7 @@ public class AmazonAthenaSync implements AmazonAthena {
                 break;
             case "FAILED":
             case "CANCELLED":
-                throw new AthenaResourceProvisionException(status.getStateChangeReason());
+                throw new AthenaProvisionException(status.getStateChangeReason());
             default:
                 throw new IllegalStateException();
         }

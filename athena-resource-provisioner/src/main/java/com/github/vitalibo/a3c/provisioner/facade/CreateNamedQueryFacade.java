@@ -7,7 +7,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.util.StringUtils;
-import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
+import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryData;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryProperties;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class CreateNamedQueryFacade implements CreateFacade<NamedQueryProperties
     private final AmazonS3 amazonS3;
 
     @Override
-    public NamedQueryData create(NamedQueryProperties properties) throws AthenaResourceProvisionException {
+    public NamedQueryData create(NamedQueryProperties properties) throws AthenaProvisionException {
         rules.forEach(rule -> rule.accept(properties));
 
         CreateNamedQueryResult result = amazonAthena.createNamedQuery(new CreateNamedQueryRequest()

@@ -1,6 +1,6 @@
 package com.github.vitalibo.a3c.provisioner.facade;
 
-import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
+import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.TestHelper;
 import com.github.vitalibo.a3c.provisioner.model.*;
 import com.github.vitalibo.a3c.provisioner.util.Jackson;
@@ -24,7 +24,7 @@ public class CreateFacadeTest {
     }
 
     @Test
-    public void testProcess() throws AthenaResourceProvisionException {
+    public void testProcess() throws AthenaProvisionException {
         Object namedQueryRequest = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/Athena/NamedQuery/Request.json"), Object.class);
         NamedQueryData namedQueryData = Jackson.fromJsonString(
@@ -48,8 +48,8 @@ public class CreateFacadeTest {
         Assert.assertEquals(namedQueryRequestCaptor.getValue(), Jackson.convertValue(namedQueryRequest, NamedQueryProperties.class));
     }
 
-    @Test(expectedExceptions = AthenaResourceProvisionException.class)
-    public void testFailTranslation() throws AthenaResourceProvisionException {
+    @Test(expectedExceptions = AthenaProvisionException.class)
+    public void testFailTranslation() throws AthenaProvisionException {
         ResourceProviderRequest resourceProviderRequest = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/CloudFormation/Request.json"), ResourceProviderRequest.class);
         resourceProviderRequest.setResourceType(ResourceType.NamedQuery);

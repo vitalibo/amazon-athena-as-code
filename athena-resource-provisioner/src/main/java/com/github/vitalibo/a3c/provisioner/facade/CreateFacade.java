@@ -1,6 +1,6 @@
 package com.github.vitalibo.a3c.provisioner.facade;
 
-import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
+import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.Facade;
 import com.github.vitalibo.a3c.provisioner.model.*;
 import com.github.vitalibo.a3c.provisioner.model.transform.ResourcePropertiesTranslator;
@@ -9,7 +9,7 @@ public interface CreateFacade<Properties extends ResourceProperties, Data extend
 
     @Override
     @SuppressWarnings("unchecked")
-    default ResourceProviderResponse process(ResourceProviderRequest request) throws AthenaResourceProvisionException {
+    default ResourceProviderResponse process(ResourceProviderRequest request) throws AthenaProvisionException {
         final Properties resourceProperties =
             ResourcePropertiesTranslator.of(request.getResourceType())
                 .from(request.getResourceProperties());
@@ -26,6 +26,6 @@ public interface CreateFacade<Properties extends ResourceProperties, Data extend
             .build();
     }
 
-    Data create(Properties properties) throws AthenaResourceProvisionException;
+    Data create(Properties properties) throws AthenaProvisionException;
 
 }

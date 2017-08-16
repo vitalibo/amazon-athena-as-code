@@ -3,7 +3,7 @@ package com.github.vitalibo.a3c.provisioner.facade;
 import com.amazonaws.services.athena.model.StartQueryExecutionRequest;
 import com.amazonaws.services.athena.model.StartQueryExecutionResult;
 import com.github.vitalibo.a3c.provisioner.AmazonAthenaSync;
-import com.github.vitalibo.a3c.provisioner.AthenaResourceProvisionException;
+import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.TestHelper;
 import com.github.vitalibo.a3c.provisioner.model.DatabaseData;
 import com.github.vitalibo.a3c.provisioner.model.DatabaseProperties;
@@ -35,7 +35,7 @@ public class CreateDatabaseFacadeTest {
     }
 
     @Test(expectedExceptions = RuntimeException.class)
-    public void testFailValidation() throws AthenaResourceProvisionException {
+    public void testFailValidation() throws AthenaProvisionException {
         facade = new CreateDatabaseFacade(Collections.singleton(o -> {
             throw new RuntimeException();
         }), mockAmazonAthenaSync, "s3-output-location", mockQueryStringTranslator);
@@ -44,7 +44,7 @@ public class CreateDatabaseFacadeTest {
     }
 
     @Test
-    public void testCreate() throws AthenaResourceProvisionException {
+    public void testCreate() throws AthenaProvisionException {
         DatabaseProperties databaseProperties = Jackson.fromJsonString(
             TestHelper.resourceAsJsonString("/Athena/Database/Request.json"), DatabaseProperties.class);
         StartQueryExecutionResult startQueryExecutionResult = new StartQueryExecutionResult()
