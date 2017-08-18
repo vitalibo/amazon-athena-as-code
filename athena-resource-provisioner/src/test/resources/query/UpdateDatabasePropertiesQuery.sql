@@ -1,5 +1,5 @@
-ALTER DATABASE the database name
+ALTER DATABASE `clickstreams`
 SET DBPROPERTIES (
-    'custom metadata properties key for the database definition'='custom metadata properties value for the database definition',
-    'key #2'='value #2'
+    'creator'='Jane D.',
+    'Dept.'='Marketing analytics'
 );

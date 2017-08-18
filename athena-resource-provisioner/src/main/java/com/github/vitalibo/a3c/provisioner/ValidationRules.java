@@ -1,7 +1,11 @@
 package com.github.vitalibo.a3c.provisioner;
 
 import com.amazonaws.util.StringUtils;
+import com.github.vitalibo.a3c.provisioner.model.DatabaseProperties;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryProperties;
+import com.github.vitalibo.a3c.provisioner.model.Property;
+
+import java.util.List;
 
 class ValidationRules {
 
@@ -67,6 +71,66 @@ class ValidationRules {
         if (!inRange(query.getQueryString().length(), 1, 262144)) {
             throw new AthenaProvisionException(
                 "The \"QueryString\" property has length constraints: Minimum length of 1. Maximum length of 262144.");
+        }
+    }
+
+    static void verifyName(DatabaseProperties databaseProperties) {
+        String name = databaseProperties.getName();
+        if (StringUtils.isNullOrEmpty(name)) {
+            throw new AthenaProvisionException(
+                "Required property \"Name\" cannot be null or empty.");
+        }
+
+        if (!inRange(name.length(), 1, 32)) {
+            throw new AthenaProvisionException(
+                "The \"Name\" property has length constraints: Minimum length of 1. Maximum length of 32.");
+        }
+    }
+
+    static void verifyLocation(DatabaseProperties databaseProperties) {
+        String location = databaseProperties.getLocation();
+        if (StringUtils.isNullOrEmpty(location)) {
+            return;
+        }
+
+        if (!location.matches("s3://.*/")) {
+            throw new AthenaProvisionException(
+                "The \"Location\" property must match to pattern 's3://.*/'.");
+        }
+    }
+
+    static void verifyComment(DatabaseProperties databaseProperties) {
+        String comment = databaseProperties.getComment();
+        if (StringUtils.isNullOrEmpty(comment)) {
+            return;
+        }
+
+        if (!inRange(comment.length(), 1, 1024)) {
+            throw new AthenaProvisionException(
+                "The \"Comment\" property has length constraints: Minimum length of 1. Maximum length of 1024.");
+        }
+    }
+
+    static void verifyProperties(DatabaseProperties databaseProperties) {
+        List<Property> properties = databaseProperties.getProperties();
+        if (properties == null) {
+            return;
+        }
+
+        for (int i = 0; i < properties.size(); i++) {
+            verifyProperty(i, properties.get(i));
+        }
+    }
+
+    private static void verifyProperty(int index, Property property) {
+        if (StringUtils.isNullOrEmpty(property.getName())) {
+            throw new AthenaProvisionException(
+                "Required property \"Properties[" + index + "].Name\" cannot be null or empty.");
+        }
+
+        if (StringUtils.isNullOrEmpty(property.getValue())) {
+            throw new AthenaProvisionException(
+                "Required property \"Properties[" + index + "].Value\" cannot be null or empty.");
         }
     }
 

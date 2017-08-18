@@ -17,4 +17,7 @@ public class DatabaseProperties extends ResourceProperties {
     @JsonProperty(value = "Properties")
     private List<Property> properties;
 
+    @JsonProperty(value = "Comment")
+    private String comment;
+
 }

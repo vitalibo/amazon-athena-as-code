@@ -27,9 +27,8 @@ public class DeleteDatabaseFacade implements DeleteFacade<DatabaseProperties, Da
 
         amazonAthena.waitQueryExecution(queryExecutionId);
 
-        DatabaseData data = new DatabaseData();
-        data.setPhysicalResourceId(physicalResourceId);
-        return data;
+        return new DatabaseData()
+            .withPhysicalResourceId(physicalResourceId);
     }
 
 }

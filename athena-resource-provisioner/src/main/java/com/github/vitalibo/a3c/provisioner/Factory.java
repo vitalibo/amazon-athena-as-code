@@ -54,7 +54,11 @@ public class Factory {
                     amazonS3);
             case Database:
                 return new CreateDatabaseFacade(
-                    Collections.emptyList(),
+                    Arrays.asList(
+                        ValidationRules::verifyName,
+                        ValidationRules::verifyLocation,
+                        ValidationRules::verifyComment,
+                        ValidationRules::verifyProperties),
                     new AmazonAthenaSync(amazonAthena),
                     outputLocation,
                     makeQueryStringTranslator("CreateDatabaseQuery"));
@@ -101,7 +105,11 @@ public class Factory {
                     amazonS3);
             case Database:
                 return new UpdateDatabaseFacade(
-                    Collections.emptyList(),
+                    Arrays.asList(
+                        ValidationRules::verifyName,
+                        ValidationRules::verifyLocation,
+                        ValidationRules::verifyComment,
+                        ValidationRules::verifyProperties),
                     new AmazonAthenaSync(amazonAthena),
                     outputLocation,
                     makeQueryStringTranslator("CreateDatabaseQuery"),
@@ -127,7 +135,7 @@ public class Factory {
     private <T> QueryStringTranslator<T> makeQueryStringTranslator(String resource) {
         return new QueryStringTranslator<>(
             freemarkerConfiguration.getTemplate(
-                String.format("query/%s.ftl", resource)));
+                String.format("Query/%s.ftl", resource)));
     }
 
     private static AmazonS3 createAmazonS3(Regions region) {

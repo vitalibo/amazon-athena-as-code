@@ -1,1 +1,1 @@
-DROP DATABASE the database name
+DROP DATABASE `clickstreams`;

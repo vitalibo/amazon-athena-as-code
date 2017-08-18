@@ -1,1 +1,1 @@
-DROP DATABASE ${Name}
+DROP DATABASE `${Name}`;

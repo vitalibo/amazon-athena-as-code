@@ -1,7 +1,8 @@
-CREATE DATABASE the database name
-LOCATION 's3://specifies the location where database files and metastore will be stored/'
+CREATE DATABASE `clickstreams`
+COMMENT 'Site Foo clickstream data aggregates'
+LOCATION 's3://myS3location/clickstreams'
 WITH DBPROPERTIES (
-    'custom metadata properties key for the database definition'='custom metadata properties value for the database definition',
-    'key #2'='value #2'
-);
-
+    'creator'='Jane D.',
+    'Dept.'='Marketing analytics'
+)
+;

@@ -10,12 +10,12 @@ import com.github.vitalibo.a3c.provisioner.model.transform.QueryStringTranslator
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 public class UpdateDatabaseFacade implements UpdateFacade<DatabaseProperties, DatabaseData> {
 
-    private final Collection<BiConsumer<DatabaseProperties, DatabaseProperties>> rules;
+    private final Collection<Consumer<DatabaseProperties>> rules;
 
     private final AmazonAthenaSync amazonAthena;
     private final String outputLocation;
@@ -25,7 +25,13 @@ public class UpdateDatabaseFacade implements UpdateFacade<DatabaseProperties, Da
     @Override
     public DatabaseData update(DatabaseProperties properties, DatabaseProperties oldProperties,
                                String physicalResourceId) throws AthenaProvisionException {
-        rules.forEach(rule -> rule.accept(properties, oldProperties));
+        try {
+            rules.forEach(rule -> rule.accept(oldProperties));
+        } catch (AthenaProvisionException ignore) {
+            return new DatabaseData()
+                .withPhysicalResourceId(physicalResourceId);
+        }
+        rules.forEach(rule -> rule.accept(properties));
 
         final String queryExecutionId = amazonAthena.startQueryExecution(
             new StartQueryExecutionRequest()
@@ -37,9 +43,9 @@ public class UpdateDatabaseFacade implements UpdateFacade<DatabaseProperties, Da
 
         amazonAthena.waitQueryExecution(queryExecutionId);
 
-        DatabaseData data = new DatabaseData();
-        data.setPhysicalResourceId(properties.getName());
-        return data;
+        return new DatabaseData()
+            .withPhysicalResourceId(properties.getName()
+                .toLowerCase());
     }
 
     private QueryStringTranslator<DatabaseProperties> chooseQueryStringTranslatorStrategy(String databaseName,

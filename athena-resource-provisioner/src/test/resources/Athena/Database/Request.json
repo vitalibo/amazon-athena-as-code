@@ -1,14 +1,15 @@
 {
-  "Name": "the database name",
-  "Location": "specifies the location where database files and metastore will be stored",
+  "Name": "clickstreams",
+  "Comment": "Site Foo clickstream data aggregates",
+  "Location": "s3://myS3location/clickstreams",
   "Properties": [
     {
-      "Name": "custom metadata properties key for the database definition",
-      "Value": "custom metadata properties value for the database definition"
+      "Name": "creator",
+      "Value": "Jane D."
     },
     {
-      "Name": "key #2",
-      "Value": "value #2"
+      "Name": "Dept.",
+      "Value": "Marketing analytics"
     }
   ]
 }
