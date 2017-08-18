@@ -35,7 +35,7 @@ public class DeleteNamedQueryFacadeTest {
         NamedQueryData actual = facade.delete(namedQueryProperties, "physical-resource-id");
 
         Assert.assertNotNull(actual);
-        Assert.assertNull(actual.getQueryId());
+        Assert.assertNull(actual.getNamedQueryId());
         Assert.assertEquals(actual.getPhysicalResourceId(), "physical-resource-id");
         Mockito.verify(mockAmazonAthena).deleteNamedQuery(captorDeleteNamedQueryRequest.capture());
         DeleteNamedQueryRequest deleteNamedQueryRequest = captorDeleteNamedQueryRequest.getValue();

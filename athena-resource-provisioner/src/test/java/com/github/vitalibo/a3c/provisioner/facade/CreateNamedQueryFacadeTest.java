@@ -72,7 +72,7 @@ public class CreateNamedQueryFacadeTest {
         Assert.assertEquals(createNamedQueryRequest.getDescription(), namedQueryProperties.getDescription());
         Assert.assertEquals(createNamedQueryRequest.getName(), namedQueryProperties.getName());
         Assert.assertEquals(actual.getPhysicalResourceId(), "named-query-id");
-        Assert.assertEquals(actual.getQueryId(), "named-query-id");
+        Assert.assertEquals(actual.getNamedQueryId(), "named-query-id");
         Mockito.verify(mockAmazonS3, Mockito.never()).getObject(Mockito.any());
     }
 
@@ -99,7 +99,7 @@ public class CreateNamedQueryFacadeTest {
         Assert.assertEquals(createNamedQueryRequest.getDescription(), namedQueryProperties.getDescription());
         Assert.assertEquals(createNamedQueryRequest.getName(), namedQueryProperties.getName());
         Assert.assertEquals(actual.getPhysicalResourceId(), "named-query-id");
-        Assert.assertEquals(actual.getQueryId(), "named-query-id");
+        Assert.assertEquals(actual.getNamedQueryId(), "named-query-id");
         Mockito.verify(mockAmazonS3).getObject(captorGetObjectRequest.capture());
         GetObjectRequest getObjectRequest = captorGetObjectRequest.getValue();
         Assert.assertEquals(getObjectRequest.getBucketName(), namedQueryProperties.getQuery().getS3Bucket());

@@ -11,7 +11,7 @@ public class NamedQueryDataTest {
     public void testToJson() {
         NamedQueryData response = new NamedQueryData();
         response.setPhysicalResourceId("required vendor-defined physical id that is unique for that vendor");
-        response.setQueryId("the unique identifier of the query");
+        response.setNamedQueryId("the unique identifier of the query");
 
         String actual = Jackson.toJsonString(response);
 

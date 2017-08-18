@@ -7,6 +7,11 @@ import lombok.Data;
 public class NamedQueryData extends ResourceData {
 
     @JsonProperty(value = "NamedQueryId")
-    private String queryId;
+    private String namedQueryId;
+
+    public NamedQueryData withNamedQueryId(String namedQueryId) {
+        this.namedQueryId = namedQueryId;
+        return this;
+    }
 
 }

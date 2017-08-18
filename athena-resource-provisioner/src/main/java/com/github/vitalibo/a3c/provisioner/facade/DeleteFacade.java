@@ -14,6 +14,18 @@ public interface DeleteFacade<Properties extends ResourceProperties, Data extend
             ResourcePropertiesTranslator.of(request.getResourceType())
                 .from(request.getResourceProperties());
 
+        if (request.getPhysicalResourceId()
+            .matches(request.getLogicalResourceId() + "-.*")) {
+
+            return ResourceProviderResponse.builder()
+                .status(Status.SUCCESS)
+                .logicalResourceId(request.getLogicalResourceId())
+                .requestId(request.getRequestId())
+                .stackId(request.getStackId())
+                .physicalResourceId(request.getPhysicalResourceId())
+                .build();
+        }
+
         final Data resourceData = delete(resourceProperties, request.getPhysicalResourceId());
 
         return ResourceProviderResponse.builder()

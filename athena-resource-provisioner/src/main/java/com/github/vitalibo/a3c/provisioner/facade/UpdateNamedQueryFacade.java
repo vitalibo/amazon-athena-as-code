@@ -15,13 +15,13 @@ import lombok.AllArgsConstructor;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Collection;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class UpdateNamedQueryFacade implements UpdateFacade<NamedQueryProperties, NamedQueryData> {
 
-    private final Collection<BiConsumer<NamedQueryProperties, NamedQueryProperties>> rules;
+    private final Collection<Consumer<NamedQueryProperties>> rules;
 
     private final AmazonAthena amazonAthena;
     private final AmazonS3 amazonS3;
@@ -29,7 +29,14 @@ public class UpdateNamedQueryFacade implements UpdateFacade<NamedQueryProperties
     @Override
     public NamedQueryData update(NamedQueryProperties properties, NamedQueryProperties oldProperties,
                                  String physicalResourceId) throws AthenaProvisionException {
-        rules.forEach(rule -> rule.accept(properties, oldProperties));
+        try {
+            rules.forEach(rule -> rule.accept(oldProperties));
+        } catch (AthenaProvisionException ignore) {
+            // When status UPDATE_ROLLBACK_IN_PROGRESS
+            return new NamedQueryData()
+                .withPhysicalResourceId(physicalResourceId);
+        }
+        rules.forEach(rule -> rule.accept(properties));
 
         CreateNamedQueryResult result = amazonAthena.createNamedQuery(new CreateNamedQueryRequest()
             .withDatabase(properties.getDatabase())
@@ -37,10 +44,9 @@ public class UpdateNamedQueryFacade implements UpdateFacade<NamedQueryProperties
             .withDescription(properties.getDescription())
             .withName(properties.getName()));
 
-        NamedQueryData data = new NamedQueryData();
-        data.setQueryId(result.getNamedQueryId());
-        data.setPhysicalResourceId(result.getNamedQueryId());
-        return data;
+        return new NamedQueryData()
+            .withNamedQueryId(result.getNamedQueryId())
+            .withPhysicalResourceId(result.getNamedQueryId());
     }
 
     private String asQueryString(NamedQueryProperties.Query query) {

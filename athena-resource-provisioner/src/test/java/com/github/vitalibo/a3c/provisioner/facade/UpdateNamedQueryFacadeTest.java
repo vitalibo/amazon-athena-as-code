@@ -44,7 +44,7 @@ public class UpdateNamedQueryFacadeTest {
 
     @Test(expectedExceptions = RuntimeException.class)
     public void testFailValidation() throws AthenaProvisionException {
-        facade = new UpdateNamedQueryFacade(Collections.singletonList((o, a) -> {
+        facade = new UpdateNamedQueryFacade(Collections.singletonList((o) -> {
             throw new RuntimeException();
         }), mockAmazonAthena, mockAmazonS3);
 
@@ -72,7 +72,7 @@ public class UpdateNamedQueryFacadeTest {
         Assert.assertEquals(createNamedQueryRequest.getDescription(), namedQueryProperties.getDescription());
         Assert.assertEquals(createNamedQueryRequest.getName(), namedQueryProperties.getName());
         Assert.assertEquals(actual.getPhysicalResourceId(), "named-query-id");
-        Assert.assertEquals(actual.getQueryId(), "named-query-id");
+        Assert.assertEquals(actual.getNamedQueryId(), "named-query-id");
         Mockito.verify(mockAmazonS3, Mockito.never()).getObject(Mockito.any());
     }
 
@@ -99,7 +99,7 @@ public class UpdateNamedQueryFacadeTest {
         Assert.assertEquals(createNamedQueryRequest.getDescription(), namedQueryProperties.getDescription());
         Assert.assertEquals(createNamedQueryRequest.getName(), namedQueryProperties.getName());
         Assert.assertEquals(actual.getPhysicalResourceId(), "named-query-id");
-        Assert.assertEquals(actual.getQueryId(), "named-query-id");
+        Assert.assertEquals(actual.getNamedQueryId(), "named-query-id");
         Mockito.verify(mockAmazonS3).getObject(captorGetObjectRequest.capture());
         GetObjectRequest getObjectRequest = captorGetObjectRequest.getValue();
         Assert.assertEquals(getObjectRequest.getBucketName(), namedQueryProperties.getQuery().getS3Bucket());

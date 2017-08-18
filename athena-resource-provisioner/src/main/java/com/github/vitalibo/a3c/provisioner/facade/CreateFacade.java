@@ -5,11 +5,16 @@ import com.github.vitalibo.a3c.provisioner.Facade;
 import com.github.vitalibo.a3c.provisioner.model.*;
 import com.github.vitalibo.a3c.provisioner.model.transform.ResourcePropertiesTranslator;
 
+import java.util.UUID;
+
 public interface CreateFacade<Properties extends ResourceProperties, Data extends ResourceData> extends Facade {
 
     @Override
     @SuppressWarnings("unchecked")
     default ResourceProviderResponse process(ResourceProviderRequest request) throws AthenaProvisionException {
+        request.setPhysicalResourceId(
+            request.getLogicalResourceId() + "-" + UUID.randomUUID());
+
         final Properties resourceProperties =
             ResourcePropertiesTranslator.of(request.getResourceType())
                 .from(request.getResourceProperties());

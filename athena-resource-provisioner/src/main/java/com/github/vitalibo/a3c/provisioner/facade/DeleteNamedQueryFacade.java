@@ -18,9 +18,8 @@ public class DeleteNamedQueryFacade implements DeleteFacade<NamedQueryProperties
             new DeleteNamedQueryRequest()
                 .withNamedQueryId(physicalResourceId));
 
-        NamedQueryData data = new NamedQueryData();
-        data.setPhysicalResourceId(physicalResourceId);
-        return data;
+        return new NamedQueryData()
+            .withPhysicalResourceId(physicalResourceId);
     }
 
 }

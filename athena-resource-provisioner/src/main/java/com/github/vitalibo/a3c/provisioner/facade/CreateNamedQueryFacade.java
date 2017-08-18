@@ -36,10 +36,9 @@ public class CreateNamedQueryFacade implements CreateFacade<NamedQueryProperties
             .withDescription(properties.getDescription())
             .withName(properties.getName()));
 
-        NamedQueryData data = new NamedQueryData();
-        data.setQueryId(result.getNamedQueryId());
-        data.setPhysicalResourceId(result.getNamedQueryId());
-        return data;
+        return new NamedQueryData()
+            .withNamedQueryId(result.getNamedQueryId())
+            .withPhysicalResourceId(result.getNamedQueryId());
     }
 
     private String asQueryString(NamedQueryProperties.Query query) {
