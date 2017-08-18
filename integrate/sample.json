@@ -57,7 +57,7 @@
     },
     "Table": {
       "DependsOn": "Database",
-      "Type": "Custom::AthenaExternalTable",
+      "Type": "Custom::AthenaTable",
       "Properties": {
         "ServiceToken": {
           "Fn::ImportValue": "A3CServiceToken"

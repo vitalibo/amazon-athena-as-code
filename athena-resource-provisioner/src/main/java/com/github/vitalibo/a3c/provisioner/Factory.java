@@ -16,6 +16,7 @@ import lombok.SneakyThrows;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
@@ -44,7 +45,11 @@ public class Factory {
         switch (request.getResourceType()) {
             case NamedQuery:
                 return new CreateNamedQueryFacade(
-                    Collections.emptyList(),
+                    Arrays.asList(
+                        ValidationRules::verifyDatabase,
+                        ValidationRules::verifyDescription,
+                        ValidationRules::verifyName,
+                        ValidationRules::verifyQueryString),
                     amazonAthena,
                     amazonS3);
             case Database:
@@ -87,7 +92,11 @@ public class Factory {
         switch (request.getResourceType()) {
             case NamedQuery:
                 return new UpdateNamedQueryFacade(
-                    Collections.emptyList(),
+                    Arrays.asList(
+                        ValidationRules::verifyDatabase,
+                        ValidationRules::verifyDescription,
+                        ValidationRules::verifyName,
+                        ValidationRules::verifyQueryString),
                     amazonAthena,
                     amazonS3);
             case Database:
