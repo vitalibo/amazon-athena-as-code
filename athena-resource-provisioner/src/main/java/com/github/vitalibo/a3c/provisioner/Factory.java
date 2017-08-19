@@ -134,7 +134,7 @@ public class Factory {
     private <T> QueryStringTranslator<T> makeQueryStringTranslator(String resource) {
         return new QueryStringTranslator<>(
             freemarkerConfiguration.getTemplate(
-                String.format("Query/%s.ftl", resource)));
+                String.format("Template/%s.ftl", resource)));
     }
 
     private static AmazonS3 createAmazonS3(Regions region) {

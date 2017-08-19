@@ -57,13 +57,13 @@ public class QueryStringTranslatorTest {
 
     private void testFrom(String name, Object o) throws IOException {
         QueryStringTranslator<Object> translator = new QueryStringTranslator<>(
-            cfg.getTemplate(String.format("/Query/%s.ftl", name)));
+            cfg.getTemplate(String.format("/Template/%s.ftl", name)));
 
         String actual = translator.from(o);
 
         Assert.assertNotNull(actual);
         Assert.assertEquals(actual,
-            TestHelper.resourceAsString(String.format("/Query/%s.sql", name)));
+            TestHelper.resourceAsString(String.format("/SQLQuery/%s.sql", name)));
     }
 
 }
