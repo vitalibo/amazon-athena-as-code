@@ -1,7 +1,7 @@
 CREATE EXTERNAL TABLE MyTableName (
-    `Column1` STRING  COMMENT 'Comment #1',
-    `Column2` ARRAY<STRING> ,
-    `Column3` TIMESTAMP  COMMENT 'Comment #2'
+`Column1` STRING  COMMENT 'Comment #1',
+`Column2` ARRAY<STRING> ,
+`Column3` TIMESTAMP  COMMENT 'Comment #2'
 )
 COMMENT 'This is the Table Comment.'
 PARTITIONED BY (
@@ -13,7 +13,7 @@ WITH SERDEPROPERTIES (
     'serialization.format'='1'
 )
 STORED AS TEXTFILE
-LOCATION 's3://aaa/'
+LOCATION 'aaa'
 TBLPROPERTIES (
     'has_encrypted_data'='false',
     'Key1'='Value2'

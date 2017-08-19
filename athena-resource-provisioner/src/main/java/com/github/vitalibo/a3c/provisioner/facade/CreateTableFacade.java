@@ -9,15 +9,15 @@ import com.github.vitalibo.a3c.provisioner.model.TableData;
 import com.github.vitalibo.a3c.provisioner.model.TableProperties;
 import com.github.vitalibo.a3c.provisioner.model.transform.EncryptionConfigurationTranslator;
 import com.github.vitalibo.a3c.provisioner.model.transform.QueryStringTranslator;
+import com.github.vitalibo.a3c.provisioner.util.Rules;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Collection;
-import java.util.function.Consumer;
+import lombok.experimental.Delegate;
 
 @RequiredArgsConstructor
 public class CreateTableFacade implements CreateFacade<TableProperties, TableData> {
 
-    private final Collection<Consumer<TableProperties>> rules;
+    @Delegate
+    private final Rules<TableProperties> rules;
 
     private final AmazonAthenaSync amazonAthena;
     private final String outputLocation;
@@ -25,8 +25,6 @@ public class CreateTableFacade implements CreateFacade<TableProperties, TableDat
 
     @Override
     public TableData create(TableProperties properties) throws AthenaProvisionException {
-        rules.forEach(rule -> rule.accept(properties));
-
         String queryExecutionId = amazonAthena.startQueryExecution(
             new StartQueryExecutionRequest()
                 .withQueryString(createTableQueryTranslator.from(properties))
@@ -40,9 +38,8 @@ public class CreateTableFacade implements CreateFacade<TableProperties, TableDat
 
         amazonAthena.waitQueryExecution(queryExecutionId);
 
-        TableData data = new TableData();
-        data.setPhysicalResourceId(properties.getName());
-        return data;
+        return new TableData()
+            .withPhysicalResourceId(properties.getName());
     }
 
 }

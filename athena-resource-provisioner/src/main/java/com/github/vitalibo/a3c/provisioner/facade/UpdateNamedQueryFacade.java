@@ -2,7 +2,6 @@ package com.github.vitalibo.a3c.provisioner.facade;
 
 import com.amazonaws.services.athena.AmazonAthena;
 import com.amazonaws.services.athena.model.CreateNamedQueryRequest;
-import com.amazonaws.services.athena.model.CreateNamedQueryResult;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
@@ -10,18 +9,19 @@ import com.amazonaws.util.StringUtils;
 import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryData;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryProperties;
+import com.github.vitalibo.a3c.provisioner.util.Rules;
 import lombok.AllArgsConstructor;
+import lombok.experimental.Delegate;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Collection;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class UpdateNamedQueryFacade implements UpdateFacade<NamedQueryProperties, NamedQueryData> {
 
-    private final Collection<Consumer<NamedQueryProperties>> rules;
+    @Delegate
+    private final Rules<NamedQueryProperties> rules;
 
     private final AmazonAthena amazonAthena;
     private final AmazonS3 amazonS3;
@@ -29,24 +29,17 @@ public class UpdateNamedQueryFacade implements UpdateFacade<NamedQueryProperties
     @Override
     public NamedQueryData update(NamedQueryProperties properties, NamedQueryProperties oldProperties,
                                  String physicalResourceId) throws AthenaProvisionException {
-        try {
-            rules.forEach(rule -> rule.accept(oldProperties));
-        } catch (AthenaProvisionException ignore) {
-            // When status UPDATE_ROLLBACK_IN_PROGRESS
-            return new NamedQueryData()
-                .withPhysicalResourceId(physicalResourceId);
-        }
-        rules.forEach(rule -> rule.accept(properties));
-
-        CreateNamedQueryResult result = amazonAthena.createNamedQuery(new CreateNamedQueryRequest()
-            .withDatabase(properties.getDatabase())
-            .withQueryString(asQueryString(properties.getQuery()))
-            .withDescription(properties.getDescription())
-            .withName(properties.getName()));
+        String namedQueryId = amazonAthena.createNamedQuery(
+            new CreateNamedQueryRequest()
+                .withDatabase(properties.getDatabase())
+                .withQueryString(asQueryString(properties.getQuery()))
+                .withDescription(properties.getDescription())
+                .withName(properties.getName()))
+            .getNamedQueryId();
 
         return new NamedQueryData()
-            .withNamedQueryId(result.getNamedQueryId())
-            .withPhysicalResourceId(result.getNamedQueryId());
+            .withNamedQueryId(namedQueryId)
+            .withPhysicalResourceId(namedQueryId);
     }
 
     private String asQueryString(NamedQueryProperties.Query query) {

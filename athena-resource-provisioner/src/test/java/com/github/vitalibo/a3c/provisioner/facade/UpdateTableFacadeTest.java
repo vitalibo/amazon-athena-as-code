@@ -9,12 +9,11 @@ import com.github.vitalibo.a3c.provisioner.model.TableData;
 import com.github.vitalibo.a3c.provisioner.model.TableProperties;
 import com.github.vitalibo.a3c.provisioner.model.transform.QueryStringTranslator;
 import com.github.vitalibo.a3c.provisioner.util.Jackson;
+import com.github.vitalibo.a3c.provisioner.util.Rules;
 import org.mockito.*;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.Collections;
 
 public class UpdateTableFacadeTest {
 
@@ -26,6 +25,8 @@ public class UpdateTableFacadeTest {
     private QueryStringTranslator<TableProperties> mockDropQueryStringTranslator;
     @Captor
     private ArgumentCaptor<StartQueryExecutionRequest> captorStartQueryExecutionRequest;
+    @Mock
+    private Rules<TableProperties> mockRules;
 
     private UpdateTableFacade facade;
 
@@ -33,7 +34,7 @@ public class UpdateTableFacadeTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         facade = new UpdateTableFacade(
-            Collections.emptyList(), mockAmazonAthenaSync, "s3-output-location",
+            mockRules, mockAmazonAthenaSync, "s3-output-location",
             mockCreateQueryStringTranslator, mockDropQueryStringTranslator);
     }
 

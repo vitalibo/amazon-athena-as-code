@@ -2,7 +2,6 @@ package com.github.vitalibo.a3c.provisioner.facade;
 
 import com.amazonaws.services.athena.AmazonAthena;
 import com.amazonaws.services.athena.model.CreateNamedQueryRequest;
-import com.amazonaws.services.athena.model.CreateNamedQueryResult;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
@@ -10,35 +9,36 @@ import com.amazonaws.util.StringUtils;
 import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryData;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryProperties;
+import com.github.vitalibo.a3c.provisioner.util.Rules;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Delegate;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Collection;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class CreateNamedQueryFacade implements CreateFacade<NamedQueryProperties, NamedQueryData> {
 
-    private final Collection<Consumer<NamedQueryProperties>> rules;
+    @Delegate
+    private final Rules<NamedQueryProperties> rules;
 
     private final AmazonAthena amazonAthena;
     private final AmazonS3 amazonS3;
 
     @Override
     public NamedQueryData create(NamedQueryProperties properties) throws AthenaProvisionException {
-        rules.forEach(rule -> rule.accept(properties));
-
-        CreateNamedQueryResult result = amazonAthena.createNamedQuery(new CreateNamedQueryRequest()
-            .withDatabase(properties.getDatabase())
-            .withQueryString(asQueryString(properties.getQuery()))
-            .withDescription(properties.getDescription())
-            .withName(properties.getName()));
+        String namedQueryId = amazonAthena.createNamedQuery(
+            new CreateNamedQueryRequest()
+                .withDatabase(properties.getDatabase())
+                .withQueryString(asQueryString(properties.getQuery()))
+                .withDescription(properties.getDescription())
+                .withName(properties.getName()))
+            .getNamedQueryId();
 
         return new NamedQueryData()
-            .withNamedQueryId(result.getNamedQueryId())
-            .withPhysicalResourceId(result.getNamedQueryId());
+            .withNamedQueryId(namedQueryId)
+            .withPhysicalResourceId(namedQueryId);
     }
 
     private String asQueryString(NamedQueryProperties.Query query) {

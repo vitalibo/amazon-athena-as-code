@@ -6,8 +6,9 @@ import com.github.vitalibo.a3c.provisioner.model.*;
 import com.github.vitalibo.a3c.provisioner.model.transform.ResourcePropertiesTranslator;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
-public interface CreateFacade<Properties extends ResourceProperties, Data extends ResourceData> extends Facade {
+public interface CreateFacade<Properties extends ResourceProperties, Data extends ResourceData> extends Facade, Consumer<Properties> {
 
     @Override
     @SuppressWarnings("unchecked")
@@ -19,6 +20,7 @@ public interface CreateFacade<Properties extends ResourceProperties, Data extend
             ResourcePropertiesTranslator.of(request.getResourceType())
                 .from(request.getResourceProperties());
 
+        accept(resourceProperties);
         final Data resourceData = create(resourceProperties);
 
         return ResourceProviderResponse.builder()

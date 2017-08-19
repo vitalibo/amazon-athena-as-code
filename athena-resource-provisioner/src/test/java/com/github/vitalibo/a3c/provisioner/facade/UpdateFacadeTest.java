@@ -56,6 +56,8 @@ public class UpdateFacadeTest {
             Mockito.eq(resourceProviderRequest.getPhysicalResourceId()));
         Assert.assertEquals(namedQueryRequestCaptor.getValue(), Jackson.convertValue(namedQueryRequest, NamedQueryProperties.class));
         Assert.assertEquals(newNamedQueryRequestCaptor.getValue(), Jackson.convertValue(newNamedQueryRequest, NamedQueryProperties.class));
+        Mockito.verify(spyCreateFacade).accept(namedQueryRequestCaptor.getValue());
+        Mockito.verify(spyCreateFacade).accept(newNamedQueryRequestCaptor.getValue());
     }
 
 
@@ -89,6 +91,33 @@ public class UpdateFacadeTest {
         Assert.assertEquals(actual.getPhysicalResourceId(), resourceProviderRequest.getPhysicalResourceId());
         Assert.assertNull(actual.getData());
         Mockito.verify(spyCreateFacade, Mockito.never()).update(Mockito.any(), Mockito.any(), Mockito.any());
+    }
+
+    @Test(expectedExceptions = AthenaProvisionException.class)
+    public void testFailValidation() throws AthenaProvisionException {
+        ResourceProviderRequest resourceProviderRequest = Jackson.fromJsonString(
+            TestHelper.resourceAsJsonString("/CloudFormation/Request.json"), ResourceProviderRequest.class);
+        resourceProviderRequest.setResourceType(ResourceType.NamedQuery);
+        resourceProviderRequest.setResourceProperties(Collections.singletonMap("Name", "bar"));
+        resourceProviderRequest.setOldResourceProperties(Collections.singletonMap("Name", "bar2"));
+        Mockito.doNothing().doThrow(AthenaProvisionException.class).when(spyCreateFacade).accept(Mockito.any());
+
+        spyCreateFacade.process(resourceProviderRequest);
+    }
+
+    @Test
+    public void testProgressUpdateRollback() {
+        ResourceProviderRequest resourceProviderRequest = Jackson.fromJsonString(
+            TestHelper.resourceAsJsonString("/CloudFormation/Request.json"), ResourceProviderRequest.class);
+        resourceProviderRequest.setResourceType(ResourceType.NamedQuery);
+        resourceProviderRequest.setResourceProperties(Collections.singletonMap("Name", "bar"));
+        resourceProviderRequest.setOldResourceProperties(Collections.singletonMap("Name", "bar2"));
+        Mockito.doThrow(AthenaProvisionException.class).when(spyCreateFacade).accept(Mockito.any());
+
+        ResourceProviderResponse actual = spyCreateFacade.process(resourceProviderRequest);
+
+        Assert.assertNotNull(actual);
+        Assert.assertEquals(actual.getStatus(), Status.SUCCESS);
     }
 
     private static Object makeNewNamedQueryRequest(NamedQueryProperties oldNamedQueryProperties) {

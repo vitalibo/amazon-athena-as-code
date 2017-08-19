@@ -3,7 +3,9 @@
   "Description": "This AWS CloudFormation template Create/Update sample usage of Amazon Athena as Code service",
   "Parameters": {
     "Bucket": {
-      "Type": "String"
+      "Type": "String",
+      "Default": "amazon-athena-as-code",
+      "Description": "User name"
     }
   },
   "Resources": {
@@ -40,6 +42,7 @@
           "Fn::ImportValue": "A3CServiceToken"
         },
         "Name": "My_DataBase_Name",
+        "Comment": "This is a database comment.",
         "Location": {
           "Ref": "Bucket"
         },

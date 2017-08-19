@@ -9,15 +9,15 @@ import com.github.vitalibo.a3c.provisioner.model.TableData;
 import com.github.vitalibo.a3c.provisioner.model.TableProperties;
 import com.github.vitalibo.a3c.provisioner.model.transform.EncryptionConfigurationTranslator;
 import com.github.vitalibo.a3c.provisioner.model.transform.QueryStringTranslator;
+import com.github.vitalibo.a3c.provisioner.util.Rules;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Collection;
-import java.util.function.BiConsumer;
+import lombok.experimental.Delegate;
 
 @RequiredArgsConstructor
 public class UpdateTableFacade implements UpdateFacade<TableProperties, TableData> {
 
-    private final Collection<BiConsumer<TableProperties, TableProperties>> rules;
+    @Delegate
+    private final Rules<TableProperties> rules;
 
     private final AmazonAthenaSync amazonAthena;
     private final String outputLocation;
@@ -27,8 +27,6 @@ public class UpdateTableFacade implements UpdateFacade<TableProperties, TableDat
     @Override
     public TableData update(TableProperties properties, TableProperties oldProperties,
                             String physicalResourceId) throws AthenaProvisionException {
-        rules.forEach(rule -> rule.accept(properties, oldProperties));
-
         if (properties.getName().equals(physicalResourceId)) {
             String queryExecutionId = amazonAthena.startQueryExecution(
                 new StartQueryExecutionRequest()
@@ -57,9 +55,8 @@ public class UpdateTableFacade implements UpdateFacade<TableProperties, TableDat
 
         amazonAthena.waitQueryExecution(queryExecutionId);
 
-        TableData data = new TableData();
-        data.setPhysicalResourceId(properties.getName());
-        return data;
+        return new TableData()
+            .withPhysicalResourceId(properties.getName());
     }
 
 }

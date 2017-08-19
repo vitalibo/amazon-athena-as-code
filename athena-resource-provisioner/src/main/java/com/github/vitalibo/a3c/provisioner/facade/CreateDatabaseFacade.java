@@ -7,15 +7,15 @@ import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.model.DatabaseData;
 import com.github.vitalibo.a3c.provisioner.model.DatabaseProperties;
 import com.github.vitalibo.a3c.provisioner.model.transform.QueryStringTranslator;
+import com.github.vitalibo.a3c.provisioner.util.Rules;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Collection;
-import java.util.function.Consumer;
+import lombok.experimental.Delegate;
 
 @RequiredArgsConstructor
 public class CreateDatabaseFacade implements CreateFacade<DatabaseProperties, DatabaseData> {
 
-    private final Collection<Consumer<DatabaseProperties>> rules;
+    @Delegate
+    private final Rules<DatabaseProperties> rules;
 
     private final AmazonAthenaSync amazonAthena;
     private final String outputLocation;
@@ -23,8 +23,6 @@ public class CreateDatabaseFacade implements CreateFacade<DatabaseProperties, Da
 
     @Override
     public DatabaseData create(DatabaseProperties properties) throws AthenaProvisionException {
-        rules.forEach(rule -> rule.accept(properties));
-
         String queryExecutionId = amazonAthena.startQueryExecution(
             new StartQueryExecutionRequest()
                 .withQueryString(createDatabaseQueryTranslator.from(properties))

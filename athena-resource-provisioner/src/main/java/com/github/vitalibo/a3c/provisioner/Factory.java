@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.github.vitalibo.a3c.provisioner.facade.*;
 import com.github.vitalibo.a3c.provisioner.model.ResourceProviderRequest;
 import com.github.vitalibo.a3c.provisioner.model.transform.QueryStringTranslator;
+import com.github.vitalibo.a3c.provisioner.util.Rules;
 import com.github.vitalibo.a3c.provisioner.util.S3PreSignedURL;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
@@ -16,8 +17,6 @@ import lombok.SneakyThrows;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
 
 public class Factory {
@@ -45,7 +44,7 @@ public class Factory {
         switch (request.getResourceType()) {
             case NamedQuery:
                 return new CreateNamedQueryFacade(
-                    Arrays.asList(
+                    new Rules<>(
                         ValidationRules::verifyDatabase,
                         ValidationRules::verifyDescription,
                         ValidationRules::verifyName,
@@ -54,7 +53,7 @@ public class Factory {
                     amazonS3);
             case Database:
                 return new CreateDatabaseFacade(
-                    Arrays.asList(
+                    new Rules<>(
                         ValidationRules::verifyName,
                         ValidationRules::verifyLocation,
                         ValidationRules::verifyComment,
@@ -64,7 +63,7 @@ public class Factory {
                     makeQueryStringTranslator("CreateDatabaseQuery"));
             case Table:
                 return new CreateTableFacade(
-                    Collections.emptyList(),
+                    new Rules<>(),
                     new AmazonAthenaSync(amazonAthena),
                     outputLocation,
                     makeQueryStringTranslator("CreateTableQuery"));
@@ -96,7 +95,7 @@ public class Factory {
         switch (request.getResourceType()) {
             case NamedQuery:
                 return new UpdateNamedQueryFacade(
-                    Arrays.asList(
+                    new Rules<>(
                         ValidationRules::verifyDatabase,
                         ValidationRules::verifyDescription,
                         ValidationRules::verifyName,
@@ -105,7 +104,7 @@ public class Factory {
                     amazonS3);
             case Database:
                 return new UpdateDatabaseFacade(
-                    Arrays.asList(
+                    new Rules<>(
                         ValidationRules::verifyName,
                         ValidationRules::verifyLocation,
                         ValidationRules::verifyComment,
@@ -116,7 +115,7 @@ public class Factory {
                     makeQueryStringTranslator("UpdateDatabasePropertiesQuery"));
             case Table:
                 return new UpdateTableFacade(
-                    Collections.emptyList(),
+                    new Rules<>(),
                     new AmazonAthenaSync(amazonAthena),
                     outputLocation,
                     makeQueryStringTranslator("CreateTableQuery"),

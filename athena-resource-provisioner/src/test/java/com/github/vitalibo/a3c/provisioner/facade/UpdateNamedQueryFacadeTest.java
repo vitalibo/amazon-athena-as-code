@@ -9,9 +9,10 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.TestHelper;
-import com.github.vitalibo.a3c.provisioner.model.NamedQueryProperties;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryData;
+import com.github.vitalibo.a3c.provisioner.model.NamedQueryProperties;
 import com.github.vitalibo.a3c.provisioner.util.Jackson;
+import com.github.vitalibo.a3c.provisioner.util.Rules;
 import org.apache.http.client.methods.HttpGet;
 import org.mockito.*;
 import org.testng.Assert;
@@ -19,7 +20,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
-import java.util.Collections;
 
 public class UpdateNamedQueryFacadeTest {
 
@@ -33,22 +33,15 @@ public class UpdateNamedQueryFacadeTest {
     private S3Object mockS3Object;
     @Captor
     private ArgumentCaptor<GetObjectRequest> captorGetObjectRequest;
+    @Mock
+    private Rules<NamedQueryProperties> mockRules;
 
     private UpdateNamedQueryFacade facade;
 
     @BeforeMethod
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        facade = new UpdateNamedQueryFacade(Collections.emptyList(), mockAmazonAthena, mockAmazonS3);
-    }
-
-    @Test(expectedExceptions = RuntimeException.class)
-    public void testFailValidation() throws AthenaProvisionException {
-        facade = new UpdateNamedQueryFacade(Collections.singletonList((o) -> {
-            throw new RuntimeException();
-        }), mockAmazonAthena, mockAmazonS3);
-
-        facade.update(new NamedQueryProperties(), new NamedQueryProperties(), "physical-resource-id");
+        facade = new UpdateNamedQueryFacade(mockRules, mockAmazonAthena, mockAmazonS3);
     }
 
     @Test

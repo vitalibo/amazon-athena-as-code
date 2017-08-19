@@ -9,12 +9,11 @@ import com.github.vitalibo.a3c.provisioner.model.TableData;
 import com.github.vitalibo.a3c.provisioner.model.TableProperties;
 import com.github.vitalibo.a3c.provisioner.model.transform.QueryStringTranslator;
 import com.github.vitalibo.a3c.provisioner.util.Jackson;
+import com.github.vitalibo.a3c.provisioner.util.Rules;
 import org.mockito.*;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.Collections;
 
 public class CreateTableFacadeTest {
 
@@ -24,6 +23,8 @@ public class CreateTableFacadeTest {
     private QueryStringTranslator<TableProperties> mockQueryStringTranslator;
     @Captor
     private ArgumentCaptor<StartQueryExecutionRequest> captorStartQueryExecutionRequest;
+    @Mock
+    private Rules<TableProperties> mockRules;
 
     private CreateTableFacade facade;
 
@@ -31,16 +32,7 @@ public class CreateTableFacadeTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         facade = new CreateTableFacade(
-            Collections.emptyList(), mockAmazonAthenaSync, "s3-output-location", mockQueryStringTranslator);
-    }
-
-    @Test(expectedExceptions = RuntimeException.class)
-    public void testFailValidation() throws AthenaProvisionException {
-        facade = new CreateTableFacade(Collections.singleton(o -> {
-            throw new RuntimeException();
-        }), mockAmazonAthenaSync, "s3-output-location", mockQueryStringTranslator);
-
-        facade.create(new TableProperties());
+            mockRules, mockAmazonAthenaSync, "s3-output-location", mockQueryStringTranslator);
     }
 
     @Test
