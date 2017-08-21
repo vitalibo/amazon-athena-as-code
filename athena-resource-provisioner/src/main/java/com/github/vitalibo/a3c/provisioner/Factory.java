@@ -45,34 +45,34 @@ public class Factory {
             case NamedQuery:
                 return new CreateNamedQueryFacade(
                     new Rules<>(
-                        ValidationRules::verifyDatabase,
-                        ValidationRules::verifyDescription,
-                        ValidationRules::verifyName,
-                        ValidationRules::verifyQueryString),
+                        ValidationRules::verifyNamedQueryDatabase,
+                        ValidationRules::verifyNamedQueryDescription,
+                        ValidationRules::verifyNamedQueryName,
+                        ValidationRules::verifyNamedQueryQueryString),
                     amazonAthena,
                     amazonS3);
             case Database:
                 return new CreateDatabaseFacade(
                     new Rules<>(
-                        ValidationRules::verifyName,
-                        ValidationRules::verifyLocation,
-                        ValidationRules::verifyComment,
-                        ValidationRules::verifyProperties),
+                        ValidationRules::verifyDatabaseName,
+                        ValidationRules::verifyDatabaseLocation,
+                        ValidationRules::verifyDatabaseComment,
+                        ValidationRules::verifyDatabaseProperties),
                     new AmazonAthenaSync(amazonAthena),
                     outputLocation,
                     makeQueryStringTranslator("CreateDatabaseQuery"));
             case Table:
                 return new CreateTableFacade(
                     new Rules<>(
-                        ValidationRules::verifyName,
-                        ValidationRules::verifyDatabase,
-                        ValidationRules::verifySchema,
-                        ValidationRules::verifyComment,
-                        ValidationRules::verifyPartition,
-                        ValidationRules::verifyRowFormat,
-                        ValidationRules::verifyStoredAs,
-                        ValidationRules::verifyLocation,
-                        ValidationRules::verifyProperties),
+                        ValidationRules::verifyTableName,
+                        ValidationRules::verifyTableDatabase,
+                        ValidationRules::verifyTableSchema,
+                        ValidationRules::verifyTableComment,
+                        ValidationRules::verifyTablePartition,
+                        ValidationRules::verifyTableRowFormat,
+                        ValidationRules::verifyTableStoredAs,
+                        ValidationRules::verifyTableLocation,
+                        ValidationRules::verifyTableProperties),
                     new AmazonAthenaSync(amazonAthena),
                     outputLocation,
                     makeQueryStringTranslator("CreateTableQuery"));
@@ -105,19 +105,19 @@ public class Factory {
             case NamedQuery:
                 return new UpdateNamedQueryFacade(
                     new Rules<>(
-                        ValidationRules::verifyDatabase,
-                        ValidationRules::verifyDescription,
-                        ValidationRules::verifyName,
-                        ValidationRules::verifyQueryString),
+                        ValidationRules::verifyNamedQueryDatabase,
+                        ValidationRules::verifyNamedQueryDescription,
+                        ValidationRules::verifyNamedQueryName,
+                        ValidationRules::verifyNamedQueryQueryString),
                     amazonAthena,
                     amazonS3);
             case Database:
                 return new UpdateDatabaseFacade(
                     new Rules<>(
-                        ValidationRules::verifyName,
-                        ValidationRules::verifyLocation,
-                        ValidationRules::verifyComment,
-                        ValidationRules::verifyProperties),
+                        ValidationRules::verifyDatabaseName,
+                        ValidationRules::verifyDatabaseLocation,
+                        ValidationRules::verifyDatabaseComment,
+                        ValidationRules::verifyDatabaseProperties),
                     new AmazonAthenaSync(amazonAthena),
                     outputLocation,
                     makeQueryStringTranslator("CreateDatabaseQuery"),
@@ -125,15 +125,15 @@ public class Factory {
             case Table:
                 return new UpdateTableFacade(
                     new Rules<>(
-                        ValidationRules::verifyName,
-                        ValidationRules::verifyDatabase,
-                        ValidationRules::verifySchema,
-                        ValidationRules::verifyComment,
-                        ValidationRules::verifyPartition,
-                        ValidationRules::verifyRowFormat,
-                        ValidationRules::verifyStoredAs,
-                        ValidationRules::verifyLocation,
-                        ValidationRules::verifyProperties),
+                        ValidationRules::verifyTableName,
+                        ValidationRules::verifyTableDatabase,
+                        ValidationRules::verifyTableSchema,
+                        ValidationRules::verifyTableComment,
+                        ValidationRules::verifyTablePartition,
+                        ValidationRules::verifyTableRowFormat,
+                        ValidationRules::verifyTableStoredAs,
+                        ValidationRules::verifyTableLocation,
+                        ValidationRules::verifyTableProperties),
                     new AmazonAthenaSync(amazonAthena),
                     outputLocation,
                     makeQueryStringTranslator("CreateTableQuery"),
