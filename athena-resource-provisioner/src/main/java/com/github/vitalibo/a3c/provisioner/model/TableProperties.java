@@ -23,8 +23,11 @@ public class TableProperties extends ResourceProperties {
     @JsonProperty(value = "Partition")
     private List<Column> partition;
 
-    @JsonProperty(value = "SerDe")
-    private SerDe serDe;
+    @JsonProperty(value = "RowFormat")
+    private RowFormat rowFormat;
+
+    @JsonProperty(value = "StoredAs")
+    private String storedAs;
 
     @JsonProperty(value = "Location")
     private String location;
@@ -38,8 +41,8 @@ public class TableProperties extends ResourceProperties {
         @JsonProperty(value = "Name")
         private String name;
 
-        @JsonProperty(value = "DataType")
-        private String dataType;
+        @JsonProperty(value = "Type")
+        private String type;
 
         @JsonProperty(value = "Comment")
         private String comment;
@@ -47,22 +50,13 @@ public class TableProperties extends ResourceProperties {
     }
 
     @Data
-    public static class SerDe {
+    public static class RowFormat {
 
-        @JsonProperty(value = "RowFormat")
-        private String rowFormat;
-
-        @JsonProperty(value = "StoredAs")
-        private String storedAs;
+        @JsonProperty(value = "SerDe")
+        private String serDe;
 
         @JsonProperty(value = "Properties")
         private List<Property> properties;
-
-        @JsonProperty(value = "EncryptionOption")
-        private String encryptionOption;
-
-        @JsonProperty(value = "KMSKey")
-        private String kmsKey;
 
     }
 

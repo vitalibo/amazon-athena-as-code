@@ -1,1 +1,1 @@
-DROP TABLE ${Name}
+DROP TABLE `${Name}`

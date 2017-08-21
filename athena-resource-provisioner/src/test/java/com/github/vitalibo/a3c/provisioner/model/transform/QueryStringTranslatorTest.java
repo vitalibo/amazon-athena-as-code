@@ -63,7 +63,7 @@ public class QueryStringTranslatorTest {
 
         Assert.assertNotNull(actual);
         Assert.assertEquals(actual,
-            TestHelper.resourceAsString(String.format("/SQLQuery/%s.sql", name)));
+            TestHelper.resourceAsString(String.format("/Query/%s.sql", name)));
     }
 
 }

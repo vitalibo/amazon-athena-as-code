@@ -72,16 +72,16 @@
         "Schema": [
           {
             "Name": "Column1",
-            "DataType": "STRING",
+            "Type": "STRING",
             "Comment": "Comment #1"
           },
           {
             "Name": "Column2",
-            "DataType": "ARRAY<STRING>"
+            "Type": "ARRAY<STRING>"
           },
           {
             "Name": "Column3",
-            "DataType": "TIMESTAMP",
+            "Type": "TIMESTAMP",
             "Comment": "Comment #2"
           }
         ],
@@ -89,17 +89,16 @@
         "Partition": [
           {
             "Name": "Partition1",
-            "DataType": "TIMESTAMP"
+            "Type": "TIMESTAMP"
           },
           {
             "Name": "Partition2",
-            "DataType": "STRING",
+            "Type": "STRING",
             "Comment": "Comment #3"
           }
         ],
-        "SerDe": {
-          "RowFormat": "org.openx.data.jsonserde.JsonSerDe",
-          "StoredAs": "TEXTFILE",
+        "RowFormat": {
+          "SerDe": "org.openx.data.jsonserde.JsonSerDe",
           "Properties": [
             {
               "Name": "serialization.format",
@@ -107,6 +106,7 @@
             }
           ]
         },
+        "StoredAs": "TEXTFILE",
         "Location": {
           "Ref": "Bucket"
         },

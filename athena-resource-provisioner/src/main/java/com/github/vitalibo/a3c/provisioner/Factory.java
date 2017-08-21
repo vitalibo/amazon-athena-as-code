@@ -63,7 +63,16 @@ public class Factory {
                     makeQueryStringTranslator("CreateDatabaseQuery"));
             case Table:
                 return new CreateTableFacade(
-                    new Rules<>(),
+                    new Rules<>(
+                        ValidationRules::verifyName,
+                        ValidationRules::verifyDatabase,
+                        ValidationRules::verifySchema,
+                        ValidationRules::verifyComment,
+                        ValidationRules::verifyPartition,
+                        ValidationRules::verifyRowFormat,
+                        ValidationRules::verifyStoredAs,
+                        ValidationRules::verifyLocation,
+                        ValidationRules::verifyProperties),
                     new AmazonAthenaSync(amazonAthena),
                     outputLocation,
                     makeQueryStringTranslator("CreateTableQuery"));
@@ -115,7 +124,16 @@ public class Factory {
                     makeQueryStringTranslator("UpdateDatabasePropertiesQuery"));
             case Table:
                 return new UpdateTableFacade(
-                    new Rules<>(),
+                    new Rules<>(
+                        ValidationRules::verifyName,
+                        ValidationRules::verifyDatabase,
+                        ValidationRules::verifySchema,
+                        ValidationRules::verifyComment,
+                        ValidationRules::verifyPartition,
+                        ValidationRules::verifyRowFormat,
+                        ValidationRules::verifyStoredAs,
+                        ValidationRules::verifyLocation,
+                        ValidationRules::verifyProperties),
                     new AmazonAthenaSync(amazonAthena),
                     outputLocation,
                     makeQueryStringTranslator("CreateTableQuery"),

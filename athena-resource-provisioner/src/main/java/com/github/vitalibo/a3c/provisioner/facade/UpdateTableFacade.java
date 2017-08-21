@@ -7,7 +7,6 @@ import com.github.vitalibo.a3c.provisioner.AmazonAthenaSync;
 import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.model.TableData;
 import com.github.vitalibo.a3c.provisioner.model.TableProperties;
-import com.github.vitalibo.a3c.provisioner.model.transform.EncryptionConfigurationTranslator;
 import com.github.vitalibo.a3c.provisioner.model.transform.QueryStringTranslator;
 import com.github.vitalibo.a3c.provisioner.util.Rules;
 import lombok.RequiredArgsConstructor;
@@ -34,9 +33,7 @@ public class UpdateTableFacade implements UpdateFacade<TableProperties, TableDat
                     .withQueryExecutionContext(new QueryExecutionContext()
                         .withDatabase(oldProperties.getDatabaseName()))
                     .withResultConfiguration(new ResultConfiguration()
-                        .withOutputLocation(outputLocation)
-                        .withEncryptionConfiguration(
-                            EncryptionConfigurationTranslator.from(properties))))
+                        .withOutputLocation(outputLocation)))
                 .getQueryExecutionId();
 
             amazonAthena.waitQueryExecution(queryExecutionId);
@@ -48,9 +45,7 @@ public class UpdateTableFacade implements UpdateFacade<TableProperties, TableDat
                 .withQueryExecutionContext(new QueryExecutionContext()
                     .withDatabase(properties.getDatabaseName()))
                 .withResultConfiguration(new ResultConfiguration()
-                    .withOutputLocation(outputLocation)
-                    .withEncryptionConfiguration(
-                        EncryptionConfigurationTranslator.from(properties))))
+                    .withOutputLocation(outputLocation)))
             .getQueryExecutionId();
 
         amazonAthena.waitQueryExecution(queryExecutionId);

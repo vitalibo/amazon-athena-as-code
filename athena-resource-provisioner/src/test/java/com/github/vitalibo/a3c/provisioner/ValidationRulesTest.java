@@ -3,6 +3,7 @@ package com.github.vitalibo.a3c.provisioner;
 import com.github.vitalibo.a3c.provisioner.model.DatabaseProperties;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryProperties;
 import com.github.vitalibo.a3c.provisioner.model.Property;
+import com.github.vitalibo.a3c.provisioner.model.TableProperties;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -197,6 +198,178 @@ public class ValidationRulesTest {
             new Property("foo", null)));
 
         ValidationRules.verifyProperties(properties);
+    }
+
+    @DataProvider
+    public Object[][] samplesIncorrectName() {
+        return new Object[][]{
+            {null}, {""}, {makeString(129)}
+        };
+    }
+
+    @Test(dataProvider = "samplesIncorrectName", expectedExceptions = AthenaProvisionException.class,
+        expectedExceptionsMessageRegExp = ".*Name.*")
+    public void testVerifyNameFailed(String name) {
+        TableProperties tableProperties = new TableProperties();
+        tableProperties.setName(name);
+
+        ValidationRules.verifyName(tableProperties);
+    }
+
+    @Test
+    public void testVerifyName() {
+        TableProperties tableProperties = new TableProperties();
+        tableProperties.setName("table_name");
+
+        ValidationRules.verifyName(tableProperties);
+    }
+
+    @Test(dataProvider = "samplesDatabase", expectedExceptions = AthenaProvisionException.class,
+        expectedExceptionsMessageRegExp = ".*Database.*")
+    public void testVerifyTableDatabase(String database) {
+        TableProperties tableProperties = new TableProperties();
+        tableProperties.setDatabaseName(database);
+
+        ValidationRules.verifyDatabase(tableProperties);
+    }
+
+    @Test
+    public void testVerifyTableComment() {
+        TableProperties tableProperties = new TableProperties();
+        tableProperties.setComment("some_comment");
+
+        ValidationRules.verifyComment(tableProperties);
+    }
+
+    @Test(expectedExceptions = AthenaProvisionException.class, expectedExceptionsMessageRegExp = ".*Comment.*")
+    public void testVerifyTableCommentFailed() {
+        TableProperties tableProperties = new TableProperties();
+        tableProperties.setComment(makeString(1025));
+
+        ValidationRules.verifyComment(tableProperties);
+    }
+
+    @DataProvider
+    public Object[][] samplesStoredAs() {
+        return new Object[][]{
+            {null}, {""}, {"SEQUENCEFILE"}, {"TEXTFILE"}, {"RCFILE"}, {"ORC"}, {"PARQUET"}, {"AVRO"},
+            {"INPUTFORMAT `org.apache.hadoop.hive.ql.io.orc.OrcInputFormat` OUTPUTFORMAT `org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat`"}
+        };
+    }
+
+    @Test(dataProvider = "samplesStoredAs")
+    public void testVerifyStoredAs(String storedAs) {
+        TableProperties tableProperties = new TableProperties();
+        tableProperties.setStoredAs(storedAs);
+
+        ValidationRules.verifyStoredAs(tableProperties);
+    }
+
+    @Test(expectedExceptions = AthenaProvisionException.class, expectedExceptionsMessageRegExp = ".*StoredAs.*")
+    public void testVerifyStoredAsFailed() {
+        TableProperties tableProperties = new TableProperties();
+        tableProperties.setStoredAs("foo");
+
+        ValidationRules.verifyStoredAs(tableProperties);
+    }
+
+    @Test
+    public void testVerifyTableLocation() {
+        TableProperties tableProperties = new TableProperties();
+        tableProperties.setLocation("s3://sample.s3.bucket/folder/");
+
+        ValidationRules.verifyLocation(tableProperties);
+    }
+
+    @Test(expectedExceptions = AthenaProvisionException.class, expectedExceptionsMessageRegExp = ".*Location.*")
+    public void testVerifyTableLocationFail() {
+        TableProperties tableProperties = new TableProperties();
+        tableProperties.setLocation("sample.s3.bucket/folder/");
+
+        ValidationRules.verifyLocation(tableProperties);
+    }
+
+    @Test
+    public void testVerifyTableProperties() {
+        TableProperties properties = new TableProperties();
+        properties.setProperties(Collections.singletonList(
+            new Property("foo", "bar")));
+
+        ValidationRules.verifyProperties(properties);
+    }
+
+    @Test(expectedExceptions = AthenaProvisionException.class, expectedExceptionsMessageRegExp = ".*Properties.0..Name.*")
+    public void testVerifyTablePropertiesFails() {
+        TableProperties properties = new TableProperties();
+        properties.setProperties(Collections.singletonList(
+            new Property(null, "bar")));
+
+        ValidationRules.verifyProperties(properties);
+    }
+
+    @DataProvider
+    public Object[][] samplesDataType() {
+        return new Object[][]{
+            {"TINYINT"}, {"SMALLINT"}, {"INT"}, {"BIGINT"}, {"BOOLEAN"}, {"DOUBLE"},
+            {"STRING"}, {"BINARY"}, {"TIMESTAMP"}, {"DECIMAL"}, {"DATE"}, {"VARCHAR"},
+            {"ARRAY<STRING>"}, {"MAP<STRING,STRING>"}, {"STRUCT<Name:STRING>"}
+        };
+    }
+
+    @Test(dataProvider = "samplesDataType")
+    public void testVerifySchema(String type) {
+        TableProperties properties = new TableProperties();
+        TableProperties.Column column = new TableProperties.Column();
+        column.setName("foo");
+        column.setType(type);
+        properties.setSchema(Collections.singletonList(column));
+
+        ValidationRules.verifySchema(properties);
+    }
+
+    @Test(expectedExceptions = AthenaProvisionException.class, expectedExceptionsMessageRegExp = ".*Schema.*Name.*")
+    public void testVerifySchemaMissingName() {
+        TableProperties properties = new TableProperties();
+        TableProperties.Column column = new TableProperties.Column();
+        column.setType("STRING");
+        column.setComment("bar");
+        properties.setSchema(Collections.singletonList(column));
+
+        ValidationRules.verifySchema(properties);
+    }
+
+    @Test(expectedExceptions = AthenaProvisionException.class, expectedExceptionsMessageRegExp = ".*Schema.*Type.*")
+    public void testVerifySchemaMissingType() {
+        TableProperties properties = new TableProperties();
+        TableProperties.Column column = new TableProperties.Column();
+        column.setName("foo");
+        column.setComment("bar");
+        properties.setSchema(Collections.singletonList(column));
+
+        ValidationRules.verifySchema(properties);
+    }
+
+    @Test
+    public void testVerifyPartition() {
+        TableProperties properties = new TableProperties();
+        TableProperties.Column column = new TableProperties.Column();
+        column.setName("foo");
+        column.setType("STRING");
+        column.setComment("some comment");
+        properties.setPartition(Collections.singletonList(column));
+
+        ValidationRules.verifyPartition(properties);
+    }
+
+    @Test(expectedExceptions = AthenaProvisionException.class, expectedExceptionsMessageRegExp = ".*Partition.*Type.*")
+    public void testVerifyPartitionFailed() {
+        TableProperties properties = new TableProperties();
+        TableProperties.Column column = new TableProperties.Column();
+        column.setName("foo");
+        column.setComment("some comment");
+        properties.setPartition(Collections.singletonList(column));
+
+        ValidationRules.verifyPartition(properties);
     }
 
     private static String makeString(int length) {

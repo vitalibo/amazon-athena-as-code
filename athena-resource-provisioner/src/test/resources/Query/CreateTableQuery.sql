@@ -1,7 +1,7 @@
-CREATE EXTERNAL TABLE MyTableName (
-`Column1` STRING  COMMENT 'Comment #1',
-`Column2` ARRAY<STRING> ,
-`Column3` TIMESTAMP  COMMENT 'Comment #2'
+CREATE EXTERNAL TABLE `MyTableName` (
+    `Column1` STRING  COMMENT 'Comment #1',
+    `Column2` ARRAY<STRING> ,
+    `Column3` TIMESTAMP  COMMENT 'Comment #2'
 )
 COMMENT 'This is the Table Comment.'
 PARTITIONED BY (
