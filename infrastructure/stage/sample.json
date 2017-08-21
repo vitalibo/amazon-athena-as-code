@@ -9,6 +9,6 @@
   },
   {
     "ParameterKey": "AthenaResultOutputLocation",
-    "ParameterValue": "s3://<athena result output location>/"
+    "ParameterValue": "<athena result output location>"
   }
 ]

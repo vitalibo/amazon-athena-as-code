@@ -36,7 +36,7 @@
         "Environment": {
           "Variables": {
             "ATHENA_RESULT_OUTPUT_LOCATION": {
-              "Ref": "AthenaResultOutputLocation"
+              "Fn::Sub": "s3://${AthenaResultOutputLocation}/"
             }
           }
         },
@@ -75,6 +75,15 @@
         "SourceArn": {
           "Fn::Sub": "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*"
         }
+      }
+    },
+    "LambdaLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Sub": "/aws/lambda/${LambdaFunction}"
+        },
+        "RetentionInDays": 3
       }
     }
   },

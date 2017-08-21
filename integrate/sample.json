@@ -4,8 +4,8 @@
   "Parameters": {
     "Bucket": {
       "Type": "String",
-      "Default": "amazon-athena-as-code",
-      "Description": "User name"
+      "AllowedPattern": "^s3://.*/$",
+      "Description": "Specifies the location of the underlying data in Amazon S3 Bucket"
     }
   },
   "Resources": {

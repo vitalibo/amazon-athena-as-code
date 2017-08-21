@@ -131,10 +131,44 @@
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "*"
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${UserName}-*"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "athena:StartQueryExecution",
+                    "athena:GetQueryExecution",
+                    "athena:CreateNamedQuery",
+                    "athena:DeleteNamedQuery"
                   ],
                   "Resource": [
                     "*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:GetBucketLocation",
+                    "s3:GetObject",
+                    "s3:ListBucket",
+                    "s3:ListBucketMultipartUploads",
+                    "s3:ListMultipartUploadParts",
+                    "s3:AbortMultipartUpload",
+                    "s3:CreateBucket",
+                    "s3:PutObject"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:aws:s3:::${AthenaResultOutputLocation}"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:s3:::${AthenaResultOutputLocation}/*"
+                    }
                   ]
                 }
               ]
