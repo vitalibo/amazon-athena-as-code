@@ -1,0 +1,3 @@
+[submodule "integrate/docs"]
+	path = integrate/docs
+	url = git@github.com:vitalibo/amazon-athena-as-code.wiki.git
