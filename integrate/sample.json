@@ -9,100 +9,141 @@
     }
   },
   "Resources": {
-    "NamedQuery": {
-      "Type": "Custom::AthenaNamedQuery",
-      "Properties": {
-        "ServiceToken": {
-          "Fn::ImportValue": "A3CServiceToken"
-        },
-        "Name": "MyFirstQuery",
-        "Description": "This simple query.",
-        "Database": {
-          "Ref": "Database"
-        },
-        "Query": {
-          "QueryString": {
-            "Fn::Join": [
-              " ",
-              [
-                "SELECT * FROM",
-                {
-                  "Ref": "Table"
-                }
-              ]
-            ]
-          }
-        }
-      }
-    },
-    "Database": {
+    "SampleDB": {
       "Type": "Custom::AthenaDatabase",
       "Properties": {
         "ServiceToken": {
           "Fn::ImportValue": "A3CServiceToken"
         },
-        "Name": "My_DataBase_Name",
-        "Comment": "This is a database comment.",
+        "Name": "sampledb_cf",
+        "Comment": "This sample Amazon Athena Database created by AWS CloudFormation.",
         "Location": {
           "Ref": "Bucket"
         },
         "Properties": [
           {
-            "Name": "Key1",
-            "Value": "Value2"
+            "Name": "Project",
+            "Value": "Amazon Athena as Code"
           },
           {
-            "Name": "Key2",
-            "Value": "Value1"
+            "Name": "Creator",
+            "Value": "Vitaliy B."
           }
         ]
       }
     },
-    "Table": {
-      "DependsOn": "Database",
+    "ELBLogsTable": {
       "Type": "Custom::AthenaTable",
       "Properties": {
         "ServiceToken": {
           "Fn::ImportValue": "A3CServiceToken"
         },
-        "Name": "MyTableName",
+        "Name": "elb_logs_raw",
         "Database": {
-          "Ref": "Database"
+          "Ref": "SampleDB"
         },
         "Schema": [
           {
-            "Name": "Column1",
+            "Name": "request_timestamp",
             "Type": "STRING",
-            "Comment": "Comment #1"
+            "Comment": "The time when the load balancer received the request from the client"
           },
           {
-            "Name": "Column2",
-            "Type": "ARRAY<STRING>"
+            "Name": "elb_name",
+            "Type": "STRING",
+            "Comment": "The name of the load balancer"
           },
           {
-            "Name": "Column3",
-            "Type": "TIMESTAMP",
-            "Comment": "Comment #2"
+            "Name": "request_ip",
+            "Type": "STRING",
+            "Comment": "The IP address of the requesting client"
+          },
+          {
+            "Name": "request_port",
+            "Type": "INT",
+            "Comment": "The port of the requesting client"
+          },
+          {
+            "Name": "backend_ip",
+            "Type": "STRING",
+            "Comment": "The IP address of the registered instance that processed this request"
+          },
+          {
+            "Name": "backend_port",
+            "Type": "INT",
+            "Comment": "The port of the registered instance that processed this request"
+          },
+          {
+            "Name": "request_processing_time",
+            "Type": "DOUBLE"
+          },
+          {
+            "Name": "backend_processing_time",
+            "Type": "DOUBLE"
+          },
+          {
+            "Name": "client_response_time",
+            "Type": "DOUBLE"
+          },
+          {
+            "Name": "elb_response_code",
+            "Type": "STRING",
+            "Comment": "The status code of the response from the load balancer"
+          },
+          {
+            "Name": "backend_response_code",
+            "Type": "STRING",
+            "Comment": "The status code of the response from the registered instance"
+          },
+          {
+            "Name": "received_bytes",
+            "Type": "BIGINT",
+            "Comment": "The size of the request, in bytes, received from the client (requester)"
+          },
+          {
+            "Name": "sent_bytes",
+            "Type": "BIGINT",
+            "Comment": "The size of the response, in bytes, sent to the client (requester)"
+          },
+          {
+            "Name": "request_verb",
+            "Type": "STRING"
+          },
+          {
+            "Name": "url",
+            "Type": "STRING"
+          },
+          {
+            "Name": "protocol",
+            "Type": "STRING"
+          },
+          {
+            "Name": "user_agent",
+            "Type": "STRING",
+            "Comment": "A User-Agent string that identifies the client that originated the request"
+          },
+          {
+            "Name": "ssl_cipher",
+            "Type": "STRING",
+            "Comment": "The SSL cipher"
+          },
+          {
+            "Name": "ssl_protocol",
+            "Type": "STRING",
+            "Comment": "The SSL protocol"
           }
         ],
-        "Comment": "This is the Table Comment.",
-        "Partition": [
-          {
-            "Name": "Partition1",
-            "Type": "TIMESTAMP"
-          },
-          {
-            "Name": "Partition2",
-            "Type": "STRING",
-            "Comment": "Comment #3"
-          }
-        ],
+        "Comment": "This Amazon Athena external table describe Elastic Load Balancing requests logs",
         "RowFormat": {
-          "SerDe": "org.openx.data.jsonserde.JsonSerDe",
+          "SerDe": "org.apache.hadoop.hive.serde2.RegexSerDe",
           "Properties": [
             {
               "Name": "serialization.format",
               "Value": "1"
+            },
+            {
+              "Name": "input.regex",
+              "Value": "([^ ]*) ([^ ]*) ([^ ]*):([0-9]*) ([^ ]*)[:\\-]([0-9]*) ([-.0-9]*) ([-.0-9]*) ([-.0-9]*) (|[-0-9]*) (-|[-0-9]*) ([-0-9]*) ([-0-9]*) \\\"([^ ]*) ([^ ]*) (- |[^ ]*)\\\" (\"[^\"]*\") ([A-Z0-9-]+) ([A-Za-z0-9.-]*)$"
             }
           ]
         },
@@ -114,12 +155,37 @@
           {
             "Name": "has_encrypted_data",
             "Value": "false"
-          },
-          {
-            "Name": "Key1",
-            "Value": "Value2"
           }
         ]
+      }
+    },
+    "ELBSelectQuery": {
+      "Type": "Custom::AthenaNamedQuery",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::ImportValue": "A3CServiceToken"
+        },
+        "Name": "ELB Select Query. CF",
+        "Description": "Sample query to view peak load ELBs during a particular timeframe",
+        "Database": {
+          "Ref": "SampleDB"
+        },
+        "Query": {
+          "QueryString": {
+            "Fn::Join": [
+              "\n",
+              [
+                "SELECT elb_name, count(1) FROM",
+                {
+                  "Ref": "ELBLogsTable"
+                },
+                "WHERE elb_response_code = '200'",
+                "GROUP BY elb_name",
+                "ORDER BY 2 DESC limit 10;"
+              ]
+            ]
+          }
+        }
       }
     }
   }
