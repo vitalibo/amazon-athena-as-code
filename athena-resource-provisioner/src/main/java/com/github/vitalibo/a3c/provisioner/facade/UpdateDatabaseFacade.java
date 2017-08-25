@@ -25,8 +25,8 @@ public class UpdateDatabaseFacade implements UpdateFacade<DatabaseProperties, Da
     @Override
     public DatabaseData update(DatabaseProperties properties, DatabaseProperties oldProperties,
                                String physicalResourceId) throws AthenaProvisionException {
-        // TODO: Add support change 'Comment' and 'Location'
-        final String queryExecutionId = amazonAthena.startQueryExecution(
+        // TODO: Add support update 'Comment' and 'Location'
+        String queryExecutionId = amazonAthena.startQueryExecution(
             new StartQueryExecutionRequest()
                 .withQueryString(
                     chooseQueryStringTranslatorStrategy(properties.getName(), physicalResourceId).from(properties))
@@ -37,8 +37,8 @@ public class UpdateDatabaseFacade implements UpdateFacade<DatabaseProperties, Da
         amazonAthena.waitQueryExecution(queryExecutionId);
 
         return new DatabaseData()
-            .withPhysicalResourceId(properties.getName()
-                .toLowerCase());
+            .withName(properties.getName())
+            .withPhysicalResourceId(properties.getName());
     }
 
     private QueryStringTranslator<DatabaseProperties> chooseQueryStringTranslatorStrategy(String databaseName,

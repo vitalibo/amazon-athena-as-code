@@ -33,8 +33,8 @@ public class CreateDatabaseFacade implements CreateFacade<DatabaseProperties, Da
         amazonAthena.waitQueryExecution(queryExecutionId);
 
         return new DatabaseData()
-            .withPhysicalResourceId(properties.getName()
-                .toLowerCase());
+            .withName(properties.getName())
+            .withPhysicalResourceId(properties.getName());
     }
 
 }

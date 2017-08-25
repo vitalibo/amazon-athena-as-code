@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Consumer;
 
-public class Rules<T> implements Consumer<T> {
+public class Rules<T> implements Verify<T> {
 
     private final Collection<Consumer<T>> rules;
 
@@ -14,7 +14,7 @@ public class Rules<T> implements Consumer<T> {
     }
 
     @Override
-    public void accept(T o) {
+    public void verify(T o) {
         rules.forEach(rule -> rule.accept(o));
     }
 

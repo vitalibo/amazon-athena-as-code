@@ -56,8 +56,8 @@ public class UpdateFacadeTest {
             Mockito.eq(resourceProviderRequest.getPhysicalResourceId()));
         Assert.assertEquals(namedQueryRequestCaptor.getValue(), Jackson.convertValue(namedQueryRequest, NamedQueryProperties.class));
         Assert.assertEquals(newNamedQueryRequestCaptor.getValue(), Jackson.convertValue(newNamedQueryRequest, NamedQueryProperties.class));
-        Mockito.verify(spyCreateFacade).accept(namedQueryRequestCaptor.getValue());
-        Mockito.verify(spyCreateFacade).accept(newNamedQueryRequestCaptor.getValue());
+        Mockito.verify(spyCreateFacade).verify(namedQueryRequestCaptor.getValue());
+        Mockito.verify(spyCreateFacade).verify(newNamedQueryRequestCaptor.getValue());
     }
 
 
@@ -100,7 +100,7 @@ public class UpdateFacadeTest {
         resourceProviderRequest.setResourceType(ResourceType.NamedQuery);
         resourceProviderRequest.setResourceProperties(Collections.singletonMap("Name", "bar"));
         resourceProviderRequest.setOldResourceProperties(Collections.singletonMap("Name", "bar2"));
-        Mockito.doNothing().doThrow(AthenaProvisionException.class).when(spyCreateFacade).accept(Mockito.any());
+        Mockito.doNothing().doThrow(AthenaProvisionException.class).when(spyCreateFacade).verify(Mockito.any());
 
         spyCreateFacade.process(resourceProviderRequest);
     }
@@ -112,7 +112,7 @@ public class UpdateFacadeTest {
         resourceProviderRequest.setResourceType(ResourceType.NamedQuery);
         resourceProviderRequest.setResourceProperties(Collections.singletonMap("Name", "bar"));
         resourceProviderRequest.setOldResourceProperties(Collections.singletonMap("Name", "bar2"));
-        Mockito.doThrow(AthenaProvisionException.class).when(spyCreateFacade).accept(Mockito.any());
+        Mockito.doThrow(AthenaProvisionException.class).when(spyCreateFacade).verify(Mockito.any());
 
         ResourceProviderResponse actual = spyCreateFacade.process(resourceProviderRequest);
 

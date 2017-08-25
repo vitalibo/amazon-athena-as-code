@@ -4,13 +4,11 @@ import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.Facade;
 import com.github.vitalibo.a3c.provisioner.model.*;
 import com.github.vitalibo.a3c.provisioner.model.transform.ResourcePropertiesTranslator;
+import com.github.vitalibo.a3c.provisioner.util.Verify;
 
-import java.util.function.Consumer;
-
-public interface UpdateFacade<Properties extends ResourceProperties, Data extends ResourceData> extends Facade, Consumer<Properties> {
+public interface UpdateFacade<Properties extends ResourceProperties, Data extends ResourceData> extends Facade, Verify<Properties> {
 
     @Override
-    @SuppressWarnings("unchecked")
     default ResourceProviderResponse process(ResourceProviderRequest request) throws AthenaProvisionException {
         final Properties resourceProperties =
             ResourcePropertiesTranslator.of(request.getResourceType())
@@ -22,7 +20,7 @@ public interface UpdateFacade<Properties extends ResourceProperties, Data extend
                 ResourcePropertiesTranslator.of(request.getResourceType())
                     .from(request.getOldResourceProperties());
 
-            accept(oldResourceProperties);
+            verify(oldResourceProperties);
         } catch (AthenaProvisionException ignored) {
             // When status UPDATE_ROLLBACK_IN_PROGRESS
             return ResourceProviderResponse.builder()
@@ -34,7 +32,7 @@ public interface UpdateFacade<Properties extends ResourceProperties, Data extend
                 .build();
         }
 
-        accept(resourceProperties);
+        verify(resourceProperties);
         final Data resourceData = update(
             resourceProperties, oldResourceProperties, request.getPhysicalResourceId());
 

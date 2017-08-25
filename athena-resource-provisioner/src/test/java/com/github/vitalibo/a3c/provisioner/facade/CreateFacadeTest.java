@@ -46,7 +46,7 @@ public class CreateFacadeTest {
         Assert.assertEquals(actual.getData(), namedQueryData);
         Mockito.verify(spyCreateFacade).create(namedQueryRequestCaptor.capture());
         Assert.assertEquals(namedQueryRequestCaptor.getValue(), Jackson.convertValue(namedQueryRequest, NamedQueryProperties.class));
-        Mockito.verify(spyCreateFacade).accept(namedQueryRequestCaptor.getValue());
+        Mockito.verify(spyCreateFacade).verify(namedQueryRequestCaptor.getValue());
     }
 
     @Test(expectedExceptions = AthenaProvisionException.class)
@@ -55,7 +55,7 @@ public class CreateFacadeTest {
             TestHelper.resourceAsJsonString("/CloudFormation/Request.json"), ResourceProviderRequest.class);
         resourceProviderRequest.setResourceType(ResourceType.NamedQuery);
         resourceProviderRequest.setResourceProperties(Collections.singletonMap("Name", "bar"));
-        Mockito.doThrow(AthenaProvisionException.class).when(spyCreateFacade).accept(Mockito.any());
+        Mockito.doThrow(AthenaProvisionException.class).when(spyCreateFacade).verify(Mockito.any());
 
         spyCreateFacade.process(resourceProviderRequest);
     }

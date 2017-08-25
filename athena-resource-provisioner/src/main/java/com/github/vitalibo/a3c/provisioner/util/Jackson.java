@@ -8,15 +8,17 @@ import lombok.SneakyThrows;
 
 import java.io.InputStream;
 
-public enum Jackson {
-
-    ;
+public final class Jackson {
 
     @Getter
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     static {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    }
+
+    private Jackson() {
+        super();
     }
 
     @SneakyThrows

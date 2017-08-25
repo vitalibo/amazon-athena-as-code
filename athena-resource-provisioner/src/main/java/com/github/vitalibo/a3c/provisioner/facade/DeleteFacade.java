@@ -9,7 +9,6 @@ import com.github.vitalibo.a3c.provisioner.util.StackUtils;
 public interface DeleteFacade<Properties extends ResourceProperties, Data extends ResourceData> extends Facade {
 
     @Override
-    @SuppressWarnings("unchecked")
     default ResourceProviderResponse process(ResourceProviderRequest request) throws AthenaProvisionException {
         final Properties resourceProperties =
             ResourcePropertiesTranslator.of(request.getResourceType())

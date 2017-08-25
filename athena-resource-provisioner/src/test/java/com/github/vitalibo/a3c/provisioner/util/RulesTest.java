@@ -25,7 +25,7 @@ public class RulesTest {
     public void testVerify() {
         Object o = new Object();
 
-        rules.accept(o);
+        rules.verify(o);
 
         Mockito.verify(mockConsumer).accept(o);
     }
@@ -35,7 +35,7 @@ public class RulesTest {
         Object o = new Object();
         Mockito.doThrow(RuntimeException.class).when(mockConsumer).accept(o);
 
-        rules.accept(o);
+        rules.verify(o);
 
         Mockito.verify(mockConsumer).accept(o);
     }
