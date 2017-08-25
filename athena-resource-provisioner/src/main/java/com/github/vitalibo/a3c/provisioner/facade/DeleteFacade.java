@@ -4,6 +4,7 @@ import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.Facade;
 import com.github.vitalibo.a3c.provisioner.model.*;
 import com.github.vitalibo.a3c.provisioner.model.transform.ResourcePropertiesTranslator;
+import com.github.vitalibo.a3c.provisioner.util.StackUtils;
 
 public interface DeleteFacade<Properties extends ResourceProperties, Data extends ResourceData> extends Facade {
 
@@ -14,8 +15,7 @@ public interface DeleteFacade<Properties extends ResourceProperties, Data extend
             ResourcePropertiesTranslator.of(request.getResourceType())
                 .from(request.getResourceProperties());
 
-        if (request.getPhysicalResourceId()
-            .matches(request.getLogicalResourceId() + "-.*")) {
+        if (StackUtils.hasDefaultPhysicalResourceId(request)) {
 
             return ResourceProviderResponse.builder()
                 .status(Status.SUCCESS)

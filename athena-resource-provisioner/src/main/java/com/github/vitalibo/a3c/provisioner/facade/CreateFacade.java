@@ -4,8 +4,8 @@ import com.github.vitalibo.a3c.provisioner.AthenaProvisionException;
 import com.github.vitalibo.a3c.provisioner.Facade;
 import com.github.vitalibo.a3c.provisioner.model.*;
 import com.github.vitalibo.a3c.provisioner.model.transform.ResourcePropertiesTranslator;
+import com.github.vitalibo.a3c.provisioner.util.StackUtils;
 
-import java.util.UUID;
 import java.util.function.Consumer;
 
 public interface CreateFacade<Properties extends ResourceProperties, Data extends ResourceData> extends Facade, Consumer<Properties> {
@@ -14,7 +14,7 @@ public interface CreateFacade<Properties extends ResourceProperties, Data extend
     @SuppressWarnings("unchecked")
     default ResourceProviderResponse process(ResourceProviderRequest request) throws AthenaProvisionException {
         request.setPhysicalResourceId(
-            request.getLogicalResourceId() + "-" + UUID.randomUUID());
+            StackUtils.makeDefaultPhysicalResourceId(request));
 
         final Properties resourceProperties =
             ResourcePropertiesTranslator.of(request.getResourceType())
