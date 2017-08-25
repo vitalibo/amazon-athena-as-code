@@ -26,7 +26,7 @@ public class UpdateTableFacade implements UpdateFacade<TableProperties, TableDat
     @Override
     public TableData update(TableProperties properties, TableProperties oldProperties,
                             String physicalResourceId) throws AthenaProvisionException {
-        if (properties.getName().equals(physicalResourceId)) {
+        if (makePhysicalResourceId(properties).equals(physicalResourceId)) {
             String queryExecutionId = amazonAthena.startQueryExecution(
                 new StartQueryExecutionRequest()
                     .withQueryString(dropTableQueryTranslator.from(oldProperties))
@@ -51,7 +51,13 @@ public class UpdateTableFacade implements UpdateFacade<TableProperties, TableDat
         amazonAthena.waitQueryExecution(queryExecutionId);
 
         return new TableData()
-            .withPhysicalResourceId(properties.getName());
+            .withName(properties.getName())
+            .withPhysicalResourceId(makePhysicalResourceId(properties));
+    }
+
+    private static String makePhysicalResourceId(TableProperties properties) {
+        return String.format("%s.%s",
+            properties.getDatabaseName(), properties.getName());
     }
 
 }

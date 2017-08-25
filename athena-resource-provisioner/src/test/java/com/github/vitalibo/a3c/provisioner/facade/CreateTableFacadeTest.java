@@ -47,7 +47,7 @@ public class CreateTableFacadeTest {
         TableData actual = facade.create(tableProperties);
 
         Assert.assertNotNull(actual);
-        Assert.assertEquals(actual.getPhysicalResourceId(), tableProperties.getName());
+        Assert.assertEquals(actual.getPhysicalResourceId(), tableProperties.getDatabaseName() + "." + tableProperties.getName());
         Mockito.verify(mockAmazonAthenaSync).startQueryExecution(captorStartQueryExecutionRequest.capture());
         StartQueryExecutionRequest startQueryExecutionRequest = captorStartQueryExecutionRequest.getValue();
         Assert.assertEquals(startQueryExecutionRequest.getQueryString(), "sql-query");

@@ -36,7 +36,9 @@ public class CreateTableFacade implements CreateFacade<TableProperties, TableDat
         amazonAthena.waitQueryExecution(queryExecutionId);
 
         return new TableData()
-            .withPhysicalResourceId(properties.getName());
+            .withName(properties.getName())
+            .withPhysicalResourceId(String.format("%s.%s",
+                properties.getDatabaseName(), properties.getName()));
     }
 
 }

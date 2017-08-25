@@ -48,10 +48,10 @@ public class UpdateTableFacadeTest {
         Mockito.when(mockCreateQueryStringTranslator.from(Mockito.any())).thenReturn("sql-create");
         Mockito.when(mockDropQueryStringTranslator.from(Mockito.any())).thenReturn("sql-drop");
 
-        TableData actual = facade.update(tableProperties, tableProperties, tableProperties.getName());
+        TableData actual = facade.update(tableProperties, tableProperties, tableProperties.getDatabaseName() + "." + tableProperties.getName());
 
         Assert.assertNotNull(actual);
-        Assert.assertEquals(actual.getPhysicalResourceId(), tableProperties.getName());
+        Assert.assertEquals(actual.getPhysicalResourceId(), tableProperties.getDatabaseName() + "." + tableProperties.getName());
         Mockito.verify(mockAmazonAthenaSync, Mockito.times(2)).startQueryExecution(captorStartQueryExecutionRequest.capture());
         StartQueryExecutionRequest startQueryExecutionRequest = captorStartQueryExecutionRequest.getAllValues().get(0);
         Assert.assertEquals(startQueryExecutionRequest.getQueryString(), "sql-drop");
@@ -79,7 +79,7 @@ public class UpdateTableFacadeTest {
         TableData actual = facade.update(tableProperties, tableProperties, "old-table-name");
 
         Assert.assertNotNull(actual);
-        Assert.assertEquals(actual.getPhysicalResourceId(), tableProperties.getName());
+        Assert.assertEquals(actual.getPhysicalResourceId(), tableProperties.getDatabaseName() + "." + tableProperties.getName());
         Mockito.verify(mockAmazonAthenaSync).startQueryExecution(captorStartQueryExecutionRequest.capture());
         StartQueryExecutionRequest startQueryExecutionRequest = captorStartQueryExecutionRequest.getValue();
         Assert.assertEquals(startQueryExecutionRequest.getQueryString(), "sql-create");

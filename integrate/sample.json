@@ -177,7 +177,10 @@
               [
                 "SELECT elb_name, count(1) FROM",
                 {
-                  "Ref": "ELBLogsTable"
+                  "Fn::GetAtt": [
+                    "ELBLogsTable",
+                    "Name"
+                  ]
                 },
                 "WHERE elb_response_code = '200'",
                 "GROUP BY elb_name",
