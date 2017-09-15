@@ -5,58 +5,37 @@ import com.github.vitalibo.a3c.provisioner.model.DatabaseProperties;
 import com.github.vitalibo.a3c.provisioner.model.NamedQueryProperties;
 import com.github.vitalibo.a3c.provisioner.model.Property;
 import com.github.vitalibo.a3c.provisioner.model.TableProperties;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-class ValidationRules {
-
-    private static final Set<Pattern> KNOWN_STORED_AS_VALUES = Stream
-        .of(
-            "SEQUENCEFILE", "TEXTFILE", "RCFILE", "ORC", "PARQUET",
-            "AVRO", "INPUTFORMAT `.+` OUTPUTFORMAT `.+`")
-        .map(Pattern::compile)
-        .collect(Collectors.toSet());
-
-    private static final Set<Pattern> KNOWN_COLUMN_TYPES = Stream
-        .of(
-            "TINYINT", "SMALLINT", "INT", "BIGINT", "BOOLEAN", "DOUBLE",
-            "STRING", "BINARY", "TIMESTAMP", "DECIMAL.*", "DATE", "VARCHAR",
-            "ARRAY.+", "MAP.+", "STRUCT.+")
-        .map(Pattern::compile)
-        .collect(Collectors.toSet());
+final class ValidationRules {
 
     private ValidationRules() {
         super();
     }
 
     static void verifyNamedQueryDatabase(NamedQueryProperties o) {
-        StringValidator
-            .of("Database", o.getDatabase())
-            .verifyRequired()
-            .verifyLengthConstraints(1, 32);
+        Validators.getNamedQueryDatabase()
+            .verify(o.getDatabase());
     }
 
     static void verifyNamedQueryDescription(NamedQueryProperties o) {
-        StringValidator
-            .of("Description", o.getDescription())
-            .verifyLengthConstraints(1, 1024);
+        Validators.getNamedQueryDescription()
+            .verify(o.getDescription());
     }
 
     static void verifyNamedQueryName(NamedQueryProperties o) {
-        StringValidator
-            .of("Name", o.getName())
-            .verifyRequired()
-            .verifyLengthConstraints(1, 128);
+        Validators.getNamedQueryName()
+            .verify(o.getName());
     }
 
     static void verifyNamedQueryQueryString(NamedQueryProperties o) {
-        if (o.getQuery() == null) {
+        if (Objects.isNull(o.getQuery())) {
             throw new AthenaProvisionException(
                 "Required property \"QueryString\" cannot be null or empty.");
         }
@@ -76,228 +55,356 @@ class ValidationRules {
             }
         }
 
-        StringValidator
-            .of("QueryString", q.getQueryString())
-            .verifyLengthConstraints(1, 262144);
+        Validators.getNamedQueryNameQueryString()
+            .verify(q.getQueryString());
     }
 
     static void verifyDatabaseName(DatabaseProperties o) {
-        StringValidator
-            .of("Name", o.getName())
-            .verifyRequired()
-            .verifyLengthConstraints(1, 32);
+        Validators.getDatabaseName()
+            .verify(o.getName());
     }
 
     static void verifyDatabaseLocation(DatabaseProperties o) {
-        StringValidator
-            .of("Location", o.getLocation())
-            .verifyMatchRegex("s3://.*/");
+        Validators.getDatabaseLocation()
+            .verify(o.getLocation());
     }
 
     static void verifyDatabaseComment(DatabaseProperties o) {
-        StringValidator
-            .of("Comment", o.getComment())
-            .verifyLengthConstraints(1, 1024);
+        Validators.getDatabaseComment()
+            .verify(o.getComment());
     }
 
     static void verifyDatabaseProperties(DatabaseProperties o) {
-        PropertyValidator
-            .of("Properties", o.getProperties())
-            .verifyProperties();
+        Validators.getDatabaseProperties()
+            .verify(o.getProperties());
     }
 
     static void verifyTableName(TableProperties o) {
-        StringValidator
-            .of("Name", o.getName())
-            .verifyRequired()
-            .verifyLengthConstraints(1, 128)
-            .verifyMatchRegex("[0-9A-Za-z_]+");
+        Validators.getTableName()
+            .verify(o.getName());
     }
 
     static void verifyTableDatabase(TableProperties o) {
-        StringValidator
-            .of("Database", o.getDatabaseName())
-            .verifyRequired()
-            .verifyLengthConstraints(1, 32);
+        Validators.getTableDatabase()
+            .verify(o.getDatabaseName());
     }
 
     static void verifyTableComment(TableProperties o) {
-        StringValidator
-            .of("Comment", o.getComment())
-            .verifyLengthConstraints(1, 1024);
+        Validators.getTableComment()
+            .verify(o.getComment());
     }
 
     static void verifyTableStoredAs(TableProperties o) {
-        StringValidator
-            .of("StoredAs", o.getStoredAs())
-            .verifyAnyMatch(KNOWN_STORED_AS_VALUES);
+        Validators.getTableStoredAs()
+            .verify(o.getStoredAs());
     }
 
     static void verifyTableLocation(TableProperties o) {
-        StringValidator
-            .of("Location", o.getLocation())
-            .verifyMatchRegex("s3://.*/");
+        Validators.getTableLocation()
+            .verify(o.getLocation());
     }
 
     static void verifyTableProperties(TableProperties o) {
-        PropertyValidator
-            .of("Properties", o.getProperties())
-            .verifyProperties();
+        Validators.getTableProperties()
+            .verify(o.getProperties());
     }
 
     static void verifyTableSchema(TableProperties o) {
-        ColumnValidator
-            .of("Schema", o.getSchema())
-            .verifyRequired()
-            .verifyColumns();
+        Validators.getTableSchema()
+            .verify(o.getSchema());
     }
 
     static void verifyTablePartition(TableProperties o) {
-        ColumnValidator
-            .of("Partition", o.getPartition())
-            .verifyColumns();
+        Validators.getTablePartition()
+            .verify(o.getPartition());
     }
 
     static void verifyTableRowFormat(TableProperties o) {
-        if (o.getRowFormat() == null) {
+        TableProperties.RowFormat rw = o.getRowFormat();
+        if (Objects.isNull(rw)) {
             return;
         }
 
-        StringValidator
-            .of("SerDe", o.getRowFormat().getSerDe())
-            .verifyRequired();
-
-        PropertyValidator
-            .of("Properties", o.getRowFormat().getProperties())
-            .verifyProperties();
+        Validators.getTableSerDe()
+            .verify(rw.getSerDe());
+        Validators.getTableSerDeProperties()
+            .verify(rw.getProperties());
     }
 
-    @AllArgsConstructor(staticName = "of")
-    static class StringValidator {
+    static final class Validators {
 
-        private final String name;
-        private final String value;
+        @Getter(lazy = true)
+        private static final Validator<String> namedQueryDatabase =
+            new StringValidator("Database")
+                .verifyRequired()
+                .verifyLengthConstraints(1, 32);
+
+        @Getter(lazy = true)
+        private static final Validator<String> namedQueryDescription =
+            new StringValidator("Description")
+                .verifyLengthConstraints(1, 1024);
+
+        @Getter(lazy = true)
+        private static final Validator<String> namedQueryName =
+            new StringValidator("Name")
+                .verifyRequired()
+                .verifyLengthConstraints(1, 128);
+
+        @Getter(lazy = true)
+        private static final Validator<String> namedQueryNameQueryString =
+            new StringValidator("QueryString")
+                .verifyLengthConstraints(1, 262144);
+
+        @Getter(lazy = true)
+        private static final Validator<String> databaseName =
+            new StringValidator("Name")
+                .verifyRequired()
+                .verifyLengthConstraints(1, 32);
+
+        @Getter(lazy = true)
+        private static final Validator<String> databaseLocation =
+            new StringValidator("Location")
+                .verifyMatchRegex("s3://.*/");
+
+        @Getter(lazy = true)
+        private static final Validator<String> databaseComment =
+            new StringValidator("Comment")
+                .verifyLengthConstraints(1, 1024);
+
+        @Getter(lazy = true)
+        private static final Validator<List<Property>> databaseProperties =
+            new PropertyValidator("Properties")
+                .verifyProperties();
+
+        @Getter(lazy = true)
+        private static final Validator<String> tableName =
+            new StringValidator("Name")
+                .verifyRequired()
+                .verifyLengthConstraints(1, 128)
+                .verifyMatchRegex("[0-9A-Za-z_]+");
+
+        @Getter(lazy = true)
+        private static final Validator<String> tableDatabase =
+            new StringValidator("Database")
+                .verifyRequired()
+                .verifyLengthConstraints(1, 32);
+
+        @Getter(lazy = true)
+        private static final Validator<String> tableComment =
+            new StringValidator("Comment")
+                .verifyLengthConstraints(1, 1024);
+
+        @Getter(lazy = true)
+        private static final Validator<String> tableStoredAs =
+            new StringValidator("StoredAs")
+                .verifyAnyMatch(Arrays.asList(
+                    "SEQUENCEFILE", "TEXTFILE", "RCFILE", "ORC",
+                    "PARQUET", "AVRO", "INPUTFORMAT `.+` OUTPUTFORMAT `.+`"));
+
+        @Getter(lazy = true)
+        private static final Validator<String> tableLocation =
+            new StringValidator("Location")
+                .verifyMatchRegex("s3://.*/");
+
+        @Getter(lazy = true)
+        private static final Validator<List<Property>> tableProperties =
+            new PropertyValidator("Properties")
+                .verifyProperties();
+
+        @Getter(lazy = true)
+        private static final Validator<List<TableProperties.Column>> tableSchema =
+            new ColumnValidator("Schema")
+                .verifyRequired()
+                .verifyColumns();
+
+        @Getter(lazy = true)
+        private static final Validator<List<TableProperties.Column>> tablePartition =
+            new ColumnValidator("Partition")
+                .verifyColumns();
+
+        @Getter(lazy = true)
+        private static final Validator<String> tableSerDe =
+            new StringValidator("SerDe")
+                .verifyRequired();
+
+        @Getter(lazy = true)
+        private static final Validator<List<Property>> tableSerDeProperties =
+            new PropertyValidator("Properties")
+                .verifyProperties();
+
+        private Validators() {
+            super();
+        }
+
+    }
+
+    static abstract class Validator<Type> {
+
+        protected final String name;
+        protected final List<Consumer<Type>> rules;
+
+        Validator(String name) {
+            this.name = name;
+            this.rules = new ArrayList<>();
+        }
+
+        @SuppressWarnings("unchecked")
+        <SubClass extends Validator<Type>> SubClass add(Consumer<Type> rule) {
+            rules.add(rule);
+            return (SubClass) this;
+        }
+
+        void verify(Type o) {
+            rules.forEach(rule -> rule.accept(o));
+        }
+
+    }
+
+    static class StringValidator extends Validator<String> {
+
+        StringValidator(String name) {
+            super(name);
+        }
 
         StringValidator verifyRequired() {
-            if (StringUtils.isNullOrEmpty(value)) {
-                throw new AthenaProvisionException(String.format(
-                    "Required property \"%s\" cannot be null or empty.", name));
-            }
-
-            return this;
+            return add(value -> {
+                if (StringUtils.isNullOrEmpty(value)) {
+                    throw new AthenaProvisionException(String.format(
+                        "Required property \"%s\" cannot be null or empty.", name));
+                }
+            });
         }
 
         StringValidator verifyLengthConstraints(int min, int max) {
-            if (StringUtils.isNullOrEmpty(value)) {
-                return this;
-            }
+            return add(value -> {
+                if (StringUtils.isNullOrEmpty(value)) {
+                    return;
+                }
 
-            if (value.length() < min || value.length() > max) {
-                throw new AthenaProvisionException(String.format(
-                    "The \"%s\" property has length constraints: Minimum length of %d. Maximum length of %d.", name, min, max));
-            }
-
-            return this;
+                if (value.length() < min || value.length() > max) {
+                    throw new AthenaProvisionException(String.format(
+                        "The \"%s\" property has length constraints: Minimum length of %d. Maximum length of %d.", name, min, max));
+                }
+            });
         }
 
         StringValidator verifyMatchRegex(String regex) {
-            if (StringUtils.isNullOrEmpty(value)) {
-                return this;
-            }
+            return add(value -> {
+                if (StringUtils.isNullOrEmpty(value)) {
+                    return;
+                }
 
-            if (!value.matches(regex)) {
-                throw new AthenaProvisionException(String.format(
-                    "The \"%s\" property must match to regex \"%s\"", name, regex));
-            }
-
-            return this;
+                if (!value.matches(regex)) {
+                    throw new AthenaProvisionException(String.format(
+                        "The \"%s\" property must match to regex \"%s\"", name, regex));
+                }
+            });
         }
 
-        StringValidator verifyAnyMatch(Set<Pattern> patterns) {
-            if (StringUtils.isNullOrEmpty(value)) {
-                return this;
-            }
+        StringValidator verifyAnyMatch(List<String> values) {
+            final Set<Pattern> patterns = values.stream()
+                .map(Pattern::compile).collect(Collectors.toSet());
 
-            if (patterns.stream().map(o -> o.matcher(value)).noneMatch(Matcher::matches)) {
-                throw new AthenaProvisionException(String.format(
-                    "The value \"%s\" is not allowed for property \"%s\".", value, name));
-            }
+            return add(value -> {
+                if (StringUtils.isNullOrEmpty(value)) {
+                    return;
+                }
 
-            return this;
+                if (patterns.stream().map(o -> o.matcher(value)).noneMatch(Matcher::matches)) {
+                    throw new AthenaProvisionException(String.format(
+                        "The value \"%s\" is not allowed for property \"%s\".", value, name));
+                }
+            });
         }
 
     }
 
-    @AllArgsConstructor(staticName = "of")
-    static class PropertyValidator {
+    static class PropertyValidator extends Validator<List<Property>> {
 
-        private final String name;
-        private final List<Property> properties;
+        private final Map<String, Validator<String>> cache;
+
+        PropertyValidator(String name) {
+            super(name);
+            this.cache = new HashMap<>();
+        }
 
         PropertyValidator verifyProperties() {
-            if (properties == null) {
-                return this;
-            }
+            return add(value -> {
+                if (Objects.isNull(value)) {
+                    return;
+                }
 
-            for (int i = 0; i < properties.size(); i++) {
-                verifyProperty(String.format("%s[%d]", name, i), properties.get(i));
-            }
-
-            return this;
+                for (int i = 0; i < value.size(); i++) {
+                    verifyProperty(String.format("%s[%d]", name, i), value.get(i));
+                }
+            });
         }
 
-        private static void verifyProperty(String name, Property property) {
-            StringValidator
-                .of(name + ".Name", property.getName())
-                .verifyRequired();
+        private void verifyProperty(String name, Property property) {
+            cache.computeIfAbsent(
+                name + ".Name", key -> new StringValidator(key)
+                    .verifyRequired())
+                .verify(property.getName());
 
-            StringValidator
-                .of(name + ".Value", property.getValue())
-                .verifyRequired();
+            cache.computeIfAbsent(
+                name + ".Value", key -> new StringValidator(key)
+                    .verifyRequired())
+                .verify(property.getValue());
         }
 
     }
 
-    @AllArgsConstructor(staticName = "of")
-    static class ColumnValidator {
+    static class ColumnValidator extends Validator<List<TableProperties.Column>> {
 
-        private final String name;
-        private final List<TableProperties.Column> columns;
+        private static final List<String> KNOWN_COLUMN_TYPES = Arrays.asList(
+            "TINYINT", "SMALLINT", "INT", "BIGINT", "BOOLEAN", "DOUBLE",
+            "STRING", "BINARY", "TIMESTAMP", "DECIMAL.*", "DATE", "VARCHAR",
+            "ARRAY.+", "MAP.+", "STRUCT.+");
+
+        private final Map<String, Validator<String>> cache;
+
+        ColumnValidator(String name) {
+            super(name);
+            this.cache = new HashMap<>();
+        }
 
         ColumnValidator verifyRequired() {
-            if (columns == null || columns.isEmpty()) {
-                throw new AthenaProvisionException(String.format(
-                    "Required property \"%s\" cannot be null or empty.", name));
-            }
-
-            return this;
+            return add(columns -> {
+                if (Objects.isNull(columns) || columns.isEmpty()) {
+                    throw new AthenaProvisionException(String.format(
+                        "Required property \"%s\" cannot be null or empty.", name));
+                }
+            });
         }
 
         ColumnValidator verifyColumns() {
-            if (columns == null) {
-                return this;
-            }
+            return add(value -> {
+                if (Objects.isNull(value)) {
+                    return;
+                }
 
-            for (int i = 0; i < columns.size(); i++) {
-                verifyColumn(String.format("%s[%d]", name, i), columns.get(i));
-            }
-
-            return this;
+                for (int i = 0; i < value.size(); i++) {
+                    verifyColumn(String.format("%s[%d]", name, i), value.get(i));
+                }
+            });
         }
 
-        private static void verifyColumn(String name, TableProperties.Column column) {
-            StringValidator
-                .of(name + ".Name", column.getName())
-                .verifyRequired();
+        private void verifyColumn(String name, TableProperties.Column column) {
+            cache.computeIfAbsent(
+                name + ".Name", key -> new StringValidator(key)
+                    .verifyRequired())
+                .verify(column.getName());
 
-            StringValidator
-                .of(name + ".Type", column.getType())
-                .verifyRequired()
-                .verifyAnyMatch(KNOWN_COLUMN_TYPES);
+            cache.computeIfAbsent(
+                name + ".Type", key -> new StringValidator(key)
+                    .verifyRequired()
+                    .verifyAnyMatch(KNOWN_COLUMN_TYPES))
+                .verify(column.getType());
 
-            StringValidator
-                .of(name + ".Comment", column.getComment())
-                .verifyLengthConstraints(1, 1024);
+            cache.computeIfAbsent(
+                name + ".Comment", key -> new StringValidator(key)
+                    .verifyLengthConstraints(1, 1024))
+                .verify(column.getComment());
         }
 
     }
